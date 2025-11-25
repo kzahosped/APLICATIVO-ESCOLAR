@@ -13,6 +13,7 @@ import Announcements from './pages/Announcements';
 import Financials from './pages/Financials';
 import UserManagement from './pages/UserManagement';
 import Settings from './pages/Settings';
+import Debug from './pages/Debug';
 import StudentRegistration from './pages/StudentRegistration';
 import GradeEntry from './pages/GradeEntry';
 import Notifications from './pages/Notifications';
@@ -34,11 +35,11 @@ const MainRouter = () => {
       <Route path="/" element={
         currentUser ? (
           currentUser.role === UserRole.ADMIN ? <Navigate to="/admin" /> :
-          currentUser.role === UserRole.PROFESSOR ? <Navigate to="/professor" /> :
-          <Navigate to="/student" />
+            currentUser.role === UserRole.PROFESSOR ? <Navigate to="/professor" /> :
+              <Navigate to="/student" />
         ) : <Login />
       } />
-      
+
       {/* Admin Routes */}
       <Route path="/admin" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><UserManagement /></ProtectedRoute>} />
@@ -60,6 +61,7 @@ const MainRouter = () => {
       <Route path="/announcements" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PROFESSOR, UserRole.STUDENT]}><Announcements /></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PROFESSOR, UserRole.STUDENT]}><Notifications /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PROFESSOR, UserRole.STUDENT]}><Settings /></ProtectedRoute>} />
+      <Route path="/debug" element={<Debug />} /> {/* Added Debug route */}
     </Routes>
   );
 };
