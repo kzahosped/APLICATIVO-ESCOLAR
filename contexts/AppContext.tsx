@@ -1,43 +1,11 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User, UserRole, Grade, FinancialRecord, Announcement, InstitutionSettings, Notification, Ticket, CalendarEvent } from '../types';
-
-// --- MOCK DATA INICIAL ---
-const INITIAL_USERS: User[] = [
-  { 
-    id: '1', 
-    name: 'Administrador', 
-    email: 'admin@escola.com',
-    password: '123', 
-    role: UserRole.ADMIN, 
-    avatarUrl: 'https://ui-avatars.com/api/?name=Admin&background=3079BE&color=fff',
-    bio: 'Gestão Geral'
-  },
-  { 
-    id: '2', 
-    name: 'Prof. João', 
-    email: 'prof@escola.com',
-    password: '123', 
-    role: UserRole.PROFESSOR, 
-    avatarUrl: 'https://ui-avatars.com/api/?name=Joao&background=random',
-    classId: 'TURMA_A' 
-  },
-  { 
-    id: '3', 
-    name: 'Aluno Carlos', 
-    email: 'aluno@escola.com',
-    password: '123', 
-    role: UserRole.STUDENT, 
-    avatarUrl: 'https://ui-avatars.com/api/?name=Carlos&background=random',
-    courseId: 'TEOLOGIA',
-    classId: 'TURMA_A',
-    registrationId: '2024001'
-  }
-];
+import * as firestoreService from '../services/firestoreService';
 
 const INITIAL_SETTINGS: InstitutionSettings = {
   name: 'Seminário Teológico Servos de Cristo',
-  logoUrl: 'https://cdn-icons-png.flaticon.com/512/2997/2997257.png', 
+  logoUrl: 'https://cdn-icons-png.flaticon.com/512/2997/2997257.png',
   mission: 'Formar servos para o Reino através do ensino teológico de excelência.'
 };
 
@@ -51,32 +19,33 @@ interface AppContextType {
   tickets: Ticket[];
   events: CalendarEvent[];
   settings: InstitutionSettings;
-  
+  loading: boolean;
+
   // Auth
-  login: (email: string, password: string, role: UserRole) => boolean;
+  login: (email: string, password: string, role: UserRole) => Promise<boolean>;
   logout: () => void;
-  
+
   // Actions
-  addAnnouncement: (ann: Omit<Announcement, 'id' | 'readBy' | 'authorId'>) => void;
-  markAnnouncementAsRead: (id: string) => void;
-  removeAnnouncement: (id: string) => void;
-  
-  addFinancialRecord: (record: FinancialRecord) => void;
-  payRecord: (id: string) => void;
-  
-  createTicket: (ticket: Omit<Ticket, 'id' | 'studentId' | 'status' | 'history' | 'createdAt'>) => void;
-  updateTicketStatus: (id: string, status: Ticket['status'], comment?: string) => void;
-  
-  updateGrade: (grade: Grade) => void;
-  
-  addUser: (user: User) => void;
-  removeUser: (userId: string) => void;
-  updateUser: (user: User) => void;
+  addAnnouncement: (ann: Omit<Announcement, 'id' | 'readBy' | 'authorId'>) => Promise<void>;
+  markAnnouncementAsRead: (id: string) => Promise<void>;
+  removeAnnouncement: (id: string) => Promise<void>;
+
+  addFinancialRecord: (record: FinancialRecord) => Promise<void>;
+  payRecord: (id: string) => Promise<void>;
+
+  createTicket: (ticket: Omit<Ticket, 'id' | 'studentId' | 'status' | 'history' | 'createdAt'>) => Promise<void>;
+  updateTicketStatus: (id: string, status: Ticket['status'], comment?: string) => Promise<void>;
+
+  updateGrade: (grade: Grade) => Promise<void>;
+
+  addUser: (user: User) => Promise<void>;
+  removeUser: (userId: string) => Promise<void>;
+  updateUser: (user: User) => Promise<void>;
   updateSettings: (settings: InstitutionSettings) => void;
-  
-  markNotificationAsRead: (id: string) => void;
-  
-  // Data Access (Simulating Backend Filters)
+
+  markNotificationAsRead: (id: string) => Promise<void>;
+
+  // Data Access
   getVisibleAnnouncements: () => Announcement[];
   getVisibleFinancials: () => FinancialRecord[];
   getVisibleTickets: () => Ticket[];
@@ -87,20 +56,65 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [users, setUsers] = useState<User[]>(INITIAL_USERS);
+  const [users, setUsers] = useState<User[]>([]);
   const [financials, setFinancials] = useState<FinancialRecord[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [events, setEvents] = useState<CalendarEvent[]>([
-    { id: '1', title: 'Início das Aulas', date: '2024-02-01', type: 'Evento', targetType: 'GLOBAL' },
-    { id: '2', title: 'Prova de Teologia', date: '2024-10-25', type: 'Prova', targetType: 'CLASS', targetId: 'TURMA_A' }
-  ]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [settings, setSettings] = useState<InstitutionSettings>(INITIAL_SETTINGS);
+  const [loading, setLoading] = useState(true);
+
+  // Load data from Firestore on mount
+  useEffect(() => {
+    loadAllData();
+  }, []);
+
+  const loadAllData = async () => {
+    try {
+      setLoading(true);
+
+      // Initialize default data if needed
+      await firestoreService.initializeDefaultData();
+
+      // Load all data
+      const [
+        usersData,
+        announcementsData,
+        financialsData,
+        gradesData,
+        ticketsData,
+        notificationsData,
+        eventsData
+      ] = await Promise.all([
+        firestoreService.getUsers(),
+        firestoreService.getAnnouncements(),
+        firestoreService.getFinancialRecords(),
+        firestoreService.getGrades(),
+        firestoreService.getTickets(),
+        firestoreService.getNotifications(),
+        firestoreService.getEvents()
+      ]);
+
+      setUsers(usersData);
+      setAnnouncements(announcementsData);
+      setFinancials(financialsData);
+      setGrades(gradesData);
+      setTickets(ticketsData);
+      setNotifications(notificationsData);
+      setEvents(eventsData);
+
+      console.log('✅ All data loaded from Firestore');
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // --- AUTH ---
-  const login = (email: string, password: string, role: UserRole): boolean => {
+  const login = async (email: string, password: string, role: UserRole): Promise<boolean> => {
     const user = users.find(u => u.email === email && u.password === password);
     if (user && user.role === role) {
       setCurrentUser(user);
@@ -112,7 +126,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const logout = () => setCurrentUser(null);
 
   // --- NOTIFICATION TRIGGER LOGIC ---
-  const triggerNotification = (userId: string, title: string, message: string, link: string) => {
+  const triggerNotification = async (userId: string, title: string, message: string, link: string) => {
     const newNotif: Notification = {
       id: Date.now().toString() + Math.random(),
       userId,
@@ -122,11 +136,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       read: false,
       createdAt: new Date().toISOString()
     };
+
+    await firestoreService.createNotification(newNotif);
     setNotifications(prev => [newNotif, ...prev]);
   };
 
-  // --- ANNOUNCEMENTS (With Logic Rule: 1, 2, 3, 4, 5, 6) ---
-  const addAnnouncement = (annData: Omit<Announcement, 'id' | 'readBy' | 'authorId'>) => {
+  // --- ANNOUNCEMENTS ---
+  const addAnnouncement = async (annData: Omit<Announcement, 'id' | 'readBy' | 'authorId'>) => {
     if (!currentUser) return;
 
     const newAnnouncement: Announcement = {
@@ -136,15 +152,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       readBy: []
     };
 
+    await firestoreService.createAnnouncement(newAnnouncement);
     setAnnouncements(prev => [newAnnouncement, ...prev]);
 
-    // REGRA DE NOTIFICAÇÃO 1 & 2 & 3: Gerar push para o público alvo
+    // Trigger notifications
     let targetUsers: User[] = [];
-    
+
     if (newAnnouncement.targetType === 'GLOBAL') {
       targetUsers = users;
     } else if (newAnnouncement.targetType === 'COURSE') {
-      targetUsers = users.filter(u => u.courseId === newAnnouncement.targetId || u.role === UserRole.PROFESSOR); // Simplificação
+      targetUsers = users.filter(u => u.courseId === newAnnouncement.targetId || u.role === UserRole.PROFESSOR);
     } else if (newAnnouncement.targetType === 'CLASS') {
       targetUsers = users.filter(u => u.classId === newAnnouncement.targetId);
     } else if (newAnnouncement.targetType === 'USER') {
@@ -152,7 +169,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
 
     targetUsers.forEach(u => {
-      if (u.id !== currentUser.id) { // Não notificar a si mesmo
+      if (u.id !== currentUser.id) {
         triggerNotification(
           u.id,
           `Novo Comunicado: ${newAnnouncement.title}`,
@@ -163,23 +180,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   };
 
-  const markAnnouncementAsRead = (id: string) => {
+  const markAnnouncementAsRead = async (id: string) => {
     if (!currentUser) return;
-    setAnnouncements(prev => prev.map(ann => {
-      if (ann.id === id && !ann.readBy.includes(currentUser.id)) {
-        return { ...ann, readBy: [...ann.readBy, currentUser.id] };
-      }
-      return ann;
-    }));
+
+    const announcement = announcements.find(ann => ann.id === id);
+    if (announcement && !announcement.readBy.includes(currentUser.id)) {
+      const updatedReadBy = [...announcement.readBy, currentUser.id];
+      await firestoreService.updateAnnouncement(id, { readBy: updatedReadBy });
+
+      setAnnouncements(prev => prev.map(ann =>
+        ann.id === id ? { ...ann, readBy: updatedReadBy } : ann
+      ));
+    }
   };
 
-  const removeAnnouncement = (id: string) => {
-    // Regra 8: Admin deleta
+  const removeAnnouncement = async (id: string) => {
     if (currentUser?.role !== UserRole.ADMIN && currentUser?.role !== UserRole.PROFESSOR) return;
+
+    await firestoreService.deleteAnnouncement(id);
     setAnnouncements(prev => prev.filter(ann => ann.id !== id));
   };
 
-  // --- ACCESS CONTROL GETTERS (Rules of Visibility) ---
+  // --- ACCESS CONTROL GETTERS ---
   const getVisibleAnnouncements = () => {
     if (!currentUser) return [];
     if (currentUser.role === UserRole.ADMIN) return announcements;
@@ -189,14 +211,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (ann.targetType === 'COURSE') return currentUser.courseId === ann.targetId;
       if (ann.targetType === 'CLASS') return currentUser.classId === ann.targetId;
       if (ann.targetType === 'USER') return currentUser.id === ann.targetId;
-      if (ann.authorId === currentUser.id) return true; // Ver os próprios
+      if (ann.authorId === currentUser.id) return true;
       return false;
     });
   };
 
   const getVisibleFinancials = () => {
     if (!currentUser) return [];
-    // Regra Financeiro 1: Aluno só vê o dele. Admin/Financeiro vê tudo.
     if (currentUser.role === UserRole.STUDENT) {
       return financials.filter(f => f.studentId === currentUser.id);
     }
@@ -205,7 +226,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const getVisibleTickets = () => {
     if (!currentUser) return [];
-    // Aluno vê os seus. Admin/Suporte vê todos (ou filtrado por setor numa impl real)
     if (currentUser.role === UserRole.STUDENT) {
       return tickets.filter(t => t.studentId === currentUser.id);
     }
@@ -218,9 +238,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   // --- FINANCIALS ---
-  const addFinancialRecord = (record: FinancialRecord) => {
+  const addFinancialRecord = async (record: FinancialRecord) => {
+    await firestoreService.createFinancialRecord(record);
     setFinancials(prev => [record, ...prev]);
-    triggerNotification(
+
+    await triggerNotification(
       record.studentId,
       'Nova Cobrança',
       `Um novo lançamento de ${record.category} foi adicionado.`,
@@ -228,13 +250,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     );
   };
 
-  const payRecord = (id: string) => {
-    setFinancials(prev => prev.map(r => r.id === id ? { ...r, status: 'Pago', paidAt: new Date().toISOString() } : r));
+  const payRecord = async (id: string) => {
+    const updatedData = { status: 'Pago' as const, paidAt: new Date().toISOString() };
+    await firestoreService.updateFinancialRecord(id, updatedData);
+
+    setFinancials(prev => prev.map(r =>
+      r.id === id ? { ...r, ...updatedData } : r
+    ));
   };
 
-  // --- TICKETS (SUPPORT) ---
-  const createTicket = (ticketData: Omit<Ticket, 'id' | 'studentId' | 'status' | 'history' | 'createdAt'>) => {
+  // --- TICKETS ---
+  const createTicket = async (ticketData: Omit<Ticket, 'id' | 'studentId' | 'status' | 'history' | 'createdAt'>) => {
     if (!currentUser) return;
+
     const newTicket: Ticket = {
       ...ticketData,
       id: Date.now().toString(),
@@ -247,77 +275,111 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         authorName: currentUser.name
       }]
     };
+
+    await firestoreService.createTicket(newTicket);
     setTickets(prev => [newTicket, ...prev]);
-    
-    // Notificar Admins (Simulação)
+
+    // Notify admins
     users.filter(u => u.role === UserRole.ADMIN).forEach(admin => {
       triggerNotification(admin.id, 'Novo Chamado', `${currentUser.name} abriu um chamado: ${newTicket.subject}`, '/admin/support');
     });
   };
 
-  const updateTicketStatus = (id: string, status: Ticket['status'], comment?: string) => {
+  const updateTicketStatus = async (id: string, status: Ticket['status'], comment?: string) => {
     if (!currentUser) return;
-    setTickets(prev => prev.map(t => {
-      if (t.id === id) {
-        const updated = { ...t, status };
-        updated.history.push({
-          date: new Date().toISOString(),
-          action: `Status alterado para ${status}. ${comment ? `Obs: ${comment}` : ''}`,
-          authorName: currentUser.name
-        });
-        
-        // Notificar Aluno
-        if (t.studentId !== currentUser.id) {
-          triggerNotification(t.studentId, 'Atualização de Chamado', `Seu chamado "${t.subject}" mudou para ${status}.`, '/student/support');
-        }
-        
-        return updated;
-      }
-      return t;
-    }));
+
+    const ticket = tickets.find(t => t.id === id);
+    if (!ticket) return;
+
+    const newHistoryEntry = {
+      date: new Date().toISOString(),
+      action: `Status alterado para ${status}. ${comment ? `Obs: ${comment}` : ''}`,
+      authorName: currentUser.name
+    };
+
+    const updatedHistory = [...ticket.history, newHistoryEntry];
+
+    await firestoreService.updateTicket(id, {
+      status,
+      history: updatedHistory
+    });
+
+    setTickets(prev => prev.map(t =>
+      t.id === id ? { ...t, status, history: updatedHistory } : t
+    ));
+
+    // Notify student
+    if (ticket.studentId !== currentUser.id) {
+      await triggerNotification(ticket.studentId, 'Atualização de Chamado', `Seu chamado "${ticket.subject}" mudou para ${status}.`, '/student/support');
+    }
   };
 
   // --- ACADEMIC ---
-  const updateGrade = (newGrade: Grade) => {
+  const updateGrade = async (newGrade: Grade) => {
+    const gradeId = `${newGrade.studentId}_${newGrade.subjectId}`;
+    await firestoreService.createGrade(newGrade);
+
     setGrades(prev => {
       const existingIdx = prev.findIndex(g => g.studentId === newGrade.studentId && g.subjectId === newGrade.subjectId);
       if (existingIdx >= 0) {
         const copy = [...prev];
+        const oldGrade = copy[existingIdx];
         copy[existingIdx] = newGrade;
-        // Regra Acadêmica 3: Notificar se publicado
-        if (newGrade.published && !prev[existingIdx].published) {
-           triggerNotification(newGrade.studentId, 'Notas Publicadas', 'Novas notas disponíveis no boletim.', '/student');
+
+        // Notify if published
+        if (newGrade.published && !oldGrade.published) {
+          triggerNotification(newGrade.studentId, 'Notas Publicadas', 'Novas notas disponíveis no boletim.', '/student');
         }
+
         return copy;
       }
       return [...prev, newGrade];
     });
   };
 
-  const markNotificationAsRead = (id: string) => {
+  const markNotificationAsRead = async (id: string) => {
+    await firestoreService.updateNotification(id, { read: true });
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
   // --- USER MGMT ---
-  const addUser = (user: User) => setUsers(prev => [...prev, user]);
-  
-  const removeUser = (userId: string) => {
+  const addUser = async (user: User) => {
+    await firestoreService.createUser(user);
+    setUsers(prev => [...prev, user]);
+  };
+
+  const removeUser = async (userId: string) => {
     if (userId === '1') {
       alert("Não é possível remover o administrador principal.");
       return;
     }
+
+    await firestoreService.deleteUser(userId);
     setUsers(prev => prev.filter(u => u.id !== userId));
   };
 
-  const updateUser = (user: User) => {
+  const updateUser = async (user: User) => {
+    await firestoreService.updateUser(user.id, user);
     setUsers(users.map(u => u.id === user.id ? user : u));
     if (currentUser?.id === user.id) setCurrentUser(user);
   };
+
   const updateSettings = (s: InstitutionSettings) => setSettings(s);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Carregando dados...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AppContext.Provider value={{
-      currentUser, users, financials, grades, announcements, notifications, tickets, events, settings,
+      currentUser, users, financials, grades, announcements, notifications, tickets, events, settings, loading,
       login, logout,
       addAnnouncement, markAnnouncementAsRead, removeAnnouncement,
       addFinancialRecord, payRecord,

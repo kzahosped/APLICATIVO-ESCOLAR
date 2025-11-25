@@ -9,14 +9,14 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (!selectedRole) return;
 
-    const success = login(email, password, selectedRole);
-    
+    const success = await login(email, password, selectedRole);
+
     if (!success) {
       setError('Credenciais inválidas ou usuário não pertence a este perfil.');
     }
@@ -37,9 +37,9 @@ const Login: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark p-4">
         <div className="w-full max-w-md bg-white dark:bg-[#1a202c] rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800 animate-fade-in">
           <div className="flex justify-center mb-6">
-            <img 
-              src={settings.logoUrl} 
-              alt={settings.name} 
+            <img
+              src={settings.logoUrl}
+              alt={settings.name}
               className="h-24 w-auto object-contain drop-shadow-sm"
             />
           </div>
@@ -47,7 +47,7 @@ const Login: React.FC = () => {
           <p className="text-center text-gray-500 dark:text-gray-400 mb-8">Selecione seu perfil para continuar</p>
 
           <div className="space-y-3">
-            <button 
+            <button
               onClick={() => setSelectedRole(UserRole.ADMIN)}
               className="w-full flex items-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all group"
             >
@@ -61,7 +61,7 @@ const Login: React.FC = () => {
               <span className="material-symbols-outlined ml-auto text-gray-400 group-hover:text-primary">chevron_right</span>
             </button>
 
-            <button 
+            <button
               onClick={() => setSelectedRole(UserRole.PROFESSOR)}
               className="w-full flex items-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all group"
             >
@@ -75,7 +75,7 @@ const Login: React.FC = () => {
               <span className="material-symbols-outlined ml-auto text-gray-400 group-hover:text-primary">chevron_right</span>
             </button>
 
-            <button 
+            <button
               onClick={() => setSelectedRole(UserRole.STUDENT)}
               className="w-full flex items-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-primary hover:bg-primary/5 transition-all group"
             >
@@ -93,9 +93,9 @@ const Login: React.FC = () => {
           {/* Website CTA */}
           <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Quer conhecer mais sobre o Seminário?</p>
-            <a 
-              href="https://www.seminariosdcsul.com.br" 
-              target="_blank" 
+            <a
+              href="https://www.seminariosdcsul.com.br"
+              target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-primary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 group"
             >
@@ -112,7 +112,7 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background-light dark:bg-background-dark p-4">
       <div className="w-full max-w-md bg-white dark:bg-[#1a202c] rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-800 animate-fade-in">
-        <button 
+        <button
           onClick={() => { setSelectedRole(null); setError(''); setEmail(''); setPassword(''); }}
           className="flex items-center text-sm text-gray-500 hover:text-primary mb-6 transition-colors"
         >
@@ -135,8 +135,8 @@ const Login: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail</label>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">mail</span>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
@@ -150,8 +150,8 @@ const Login: React.FC = () => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Senha</label>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">lock</span>
-              <input 
-                type="password" 
+              <input
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
@@ -161,8 +161,8 @@ const Login: React.FC = () => {
             </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="w-full bg-primary text-white py-3 rounded-xl font-bold text-lg shadow-lg hover:bg-primary/90 transition-all transform active:scale-[0.98]"
           >
             Entrar
