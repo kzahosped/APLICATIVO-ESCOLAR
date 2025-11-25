@@ -10,13 +10,14 @@ const AdminDashboard: React.FC = () => {
 
   const totalStudents = users.filter(u => u.role === 'STUDENT').length;
   const totalRevenue = financials.reduce((acc, curr) => curr.status === 'Pago' ? acc + curr.amount : acc, 0);
-  
+
+  // Dados do gráfico de fluxo de caixa - mostrando zero até haver movimentações
   const data = [
-    { name: 'Jan', valor: 4000 },
-    { name: 'Fev', valor: 3000 },
-    { name: 'Mar', valor: 5000 },
-    { name: 'Abr', valor: 4500 },
-    { name: 'Mai', valor: 6000 },
+    { name: 'Jan', valor: 0 },
+    { name: 'Fev', valor: 0 },
+    { name: 'Mar', valor: 0 },
+    { name: 'Abr', valor: 0 },
+    { name: 'Mai', valor: 0 },
   ];
 
   return (
