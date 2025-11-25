@@ -74,11 +74,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const loadAllData = async () => {
     try {
       setLoading(true);
+      console.log('🚀 Starting data loading in AppContext...');
 
       // Initialize default data if needed
       await firestoreService.initializeDefaultData();
 
       // Load all data
+      console.log('📥 Fetching all collections from Firestore...');
       const [
         usersData,
         announcementsData,
@@ -97,6 +99,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         firestoreService.getEvents()
       ]);
 
+      console.log('✅ Data fetched successfully:', {
+        users: usersData.length,
+        announcements: announcementsData.length,
+        financials: financialsData.length,
+        grades: gradesData.length,
+        tickets: ticketsData.length,
+        notifications: notificationsData.length,
+        events: eventsData.length
+      });
+
       setUsers(usersData);
       setAnnouncements(announcementsData);
       setFinancials(financialsData);
@@ -105,9 +117,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setNotifications(notificationsData);
       setEvents(eventsData);
 
-      console.log('✅ All data loaded from Firestore');
+      console.log('✅ AppContext state updated with fetched data');
     } catch (error) {
-      console.error('Error loading data:', error);
+      console.error('❌ Error loading data in AppContext:', error);
     } finally {
       setLoading(false);
     }

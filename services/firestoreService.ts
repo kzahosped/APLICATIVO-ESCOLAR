@@ -1,22 +1,18 @@
+import { db } from './firebase';
 import {
     collection,
-    doc,
     getDocs,
-    getDoc,
-    setDoc,
     addDoc,
     updateDoc,
     deleteDoc,
+    doc,
     query,
     where,
-    orderBy,
-    onSnapshot,
-    Timestamp
+    setDoc
 } from 'firebase/firestore';
-import { db } from './firebase';
-import { User, UserRole, Grade, FinancialRecord, Announcement, Ticket, Notification, CalendarEvent } from '../types';
+import { User, Announcement, FinancialRecord, Grade, Ticket, Notification, CalendarEvent, UserRole } from '../types';
+import { INITIAL_USERS, INITIAL_EVENTS } from '../constants/initialData';
 
-// Collections
 const USERS_COLLECTION = 'users';
 const ANNOUNCEMENTS_COLLECTION = 'announcements';
 const FINANCIALS_COLLECTION = 'financials';
@@ -46,9 +42,9 @@ export const getUsers = async (): Promise<User[]> => {
     }
 };
 
-export const updateUser = async (userId: string, userData: Partial<User>) => {
+export const updateUser = async (userId: string, data: Partial<User>) => {
     try {
-        await updateDoc(doc(db, USERS_COLLECTION, userId), userData as any);
+        await updateDoc(doc(db, USERS_COLLECTION, userId), data as any);
         return true;
     } catch (error) {
         console.error('Error updating user:', error);
@@ -256,75 +252,32 @@ export const getEvents = async (): Promise<CalendarEvent[]> => {
 // ==================== INITIALIZATION ====================
 export const initializeDefaultData = async () => {
     try {
-        // Check if admin user exists
-        const usersSnapshot = await getDocs(collection(db, USERS_COLLECTION));
+        console.log('🔄 Checking if default data initialization is needed...');
+        const usersRef = collection(db, 'users');
+        const snapshot = await getDocs(usersRef);
 
-        if (usersSnapshot.empty) {
-            // Create default admin user
-            const adminUser: User = {
-                id: '1',
-                name: 'Administrador',
-                email: 'admin@escola.com',
-                password: '123',
-                role: UserRole.ADMIN,
-                avatarUrl: 'https://ui-avatars.com/api/?name=Admin&background=3079BE&color=fff',
-                bio: 'Gestão Geral'
-            };
+        console.log(`📊 Users collection has ${snapshot.size} documents`);
 
-            await createUser(adminUser);
+        if (snapshot.empty) {
+            console.log('⚠️ No users found. Initializing default data...');
 
-            // Create default professor
-            const professorUser: User = {
-                id: '2',
-                name: 'Prof. João',
-                email: 'prof@escola.com',
-                password: '123',
-                role: UserRole.PROFESSOR,
-                avatarUrl: 'https://ui-avatars.com/api/?name=Joao&background=random',
-                classId: 'TURMA_A'
-            };
+            // Add default users
+            for (const user of INITIAL_USERS) {
+                await setDoc(doc(usersRef, user.id), user);
+                console.log(`✅ Default user created: ${user.email}`);
+            }
 
-            await createUser(professorUser);
+            // Add default events
+            const eventsRef = collection(db, 'events');
+            for (const event of INITIAL_EVENTS) {
+                await setDoc(doc(eventsRef, event.id), event);
+            }
 
-            // Create default student
-            const studentUser: User = {
-                id: '3',
-                name: 'Aluno Carlos',
-                email: 'aluno@escola.com',
-                password: '123',
-                role: UserRole.STUDENT,
-                avatarUrl: 'https://ui-avatars.com/api/?name=Carlos&background=random',
-                courseId: 'TEOLOGIA',
-                classId: 'TURMA_A',
-                registrationId: '2024001'
-            };
-
-            await createUser(studentUser);
-
-            // Create default events
-            const event1: CalendarEvent = {
-                id: '1',
-                title: 'Início das Aulas',
-                date: '2024-02-01',
-                type: 'Evento',
-                targetType: 'GLOBAL'
-            };
-
-            const event2: CalendarEvent = {
-                id: '2',
-                title: 'Prova de Teologia',
-                date: '2024-10-25',
-                type: 'Prova',
-                targetType: 'CLASS',
-                targetId: 'TURMA_A'
-            };
-
-            await createEvent(event1);
-            await createEvent(event2);
-
-            console.log('✅ Default data initialized in Firestore');
+            console.log('✅ Default data initialization complete!');
+        } else {
+            console.log('✅ Data already exists. Skipping initialization.');
         }
     } catch (error) {
-        console.error('Error initializing default data:', error);
+        console.error('❌ Error initializing default data:', error);
     }
 };
