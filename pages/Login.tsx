@@ -47,60 +47,58 @@ const Login: React.FC = () => {
           <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-float p-8 border border-white/20">
             {/* Logo */}
             <div className="flex justify-center mb-6">
-              <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-4 rounded-2xl shadow-lifted">
-                <span className="material-symbols-outlined text-white text-5xl">school</span>
-              </div>
+              <img src="/256x256.png" alt="SDC Sul Logo" className="h-20 w-20 object-contain drop-shadow-lg" />
             </div>
 
-            <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
               Bem-vindo
             </h1>
-            <p className="text-center text-gray-600 mb-8">Selecione seu perfil para continuar</p>
+            <p className="text-center text-gray-600 mb-10 text-sm">Selecione seu perfil para continuar</p>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {/* Admin Role */}
               <button
                 onClick={() => setSelectedRole(UserRole.ADMIN)}
-                className="w-full flex items-center p-5 rounded-2xl bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lifted hover-lift transform transition-all"
+                className="w-full flex items-center p-5 rounded-2xl bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lifted hover-lift transform transition-all duration-300"
               >
-                <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center mr-4 backdrop-blur-sm">
-                  <span className="material-symbols-outlined text-2xl">admin_panel_settings</span>
+                <div className="h-14 w-14 rounded-xl bg-white/20 flex items-center justify-center mr-4 backdrop-blur-sm">
+                  <span className="material-symbols-outlined text-3xl">admin_panel_settings</span>
                 </div>
                 <div className="text-left flex-1">
-                  <p className="font-bold text-lg">Administrador</p>
-                  <p className="text-sm text-purple-100">Gestão e Configurações</p>
+                  <p className="font-bold text-base">Administrador</p>
+                  <p className="text-xs text-purple-100">Gestão e Configurações</p>
                 </div>
-                <span className="material-symbols-outlined">arrow_forward</span>
+                <span className="material-symbols-outlined text-xl">arrow_forward</span>
               </button>
 
               {/* Professor Role */}
               <button
                 onClick={() => setSelectedRole(UserRole.PROFESSOR)}
-                className="w-full flex items-center p-5 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lifted hover-lift transform transition-all"
+                className="w-full flex items-center p-5 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lifted hover-lift transform transition-all duration-300"
               >
-                <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center mr-4 backdrop-blur-sm">
-                  <span className="material-symbols-outlined text-2xl">school</span>
+                <div className="h-14 w-14 rounded-xl bg-white/20 flex items-center justify-center mr-4 backdrop-blur-sm">
+                  <span className="material-symbols-outlined text-3xl">school</span>
                 </div>
                 <div className="text-left flex-1">
-                  <p className="font-bold text-lg">Professor</p>
-                  <p className="text-sm text-blue-100">Diário e Notas</p>
+                  <p className="font-bold text-base">Professor</p>
+                  <p className="text-xs text-blue-100">Diário e Notas</p>
                 </div>
-                <span className="material-symbols-outlined">arrow_forward</span>
+                <span className="material-symbols-outlined text-xl">arrow_forward</span>
               </button>
 
               {/* Student Role */}
               <button
                 onClick={() => setSelectedRole(UserRole.STUDENT)}
-                className="w-full flex items-center p-5 rounded-2xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lifted hover-lift transform transition-all"
+                className="w-full flex items-center p-5 rounded-2xl bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lifted hover-lift transform transition-all duration-300"
               >
-                <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center mr-4 backdrop-blur-sm">
-                  <span className="material-symbols-outlined text-2xl">person</span>
+                <div className="h-14 w-14 rounded-xl bg-white/20 flex items-center justify-center mr-4 backdrop-blur-sm">
+                  <span className="material-symbols-outlined text-3xl">person</span>
                 </div>
                 <div className="text-left flex-1">
-                  <p className="font-bold text-lg">Aluno</p>
-                  <p className="text-sm text-green-100">Boletim e Financeiro</p>
+                  <p className="font-bold text-base">Aluno</p>
+                  <p className="text-xs text-green-100">Boletim e Financeiro</p>
                 </div>
-                <span className="material-symbols-outlined">arrow_forward</span>
+                <span className="material-symbols-outlined text-xl">arrow_forward</span>
               </button>
             </div>
 
