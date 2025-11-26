@@ -1,159 +1,158 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
 import BottomNav from '../components/BottomNav';
 
 const StudentDashboard: React.FC = () => {
-  const navigate = useNavigate();
-  const { currentUser, grades } = useApp();
-  const [selectedPeriod, setSelectedPeriod] = useState('2024/2');
+    const navigate = useNavigate();
+    const { currentUser, financials, events, getVisibleAnnouncements } = useApp();
 
-  const studentGrades = grades.filter(g => g.studentId === currentUser?.id && g.published);
+    // Dados Financeiros
+    const pendingFinancials = financials.filter(f => f.studentId === currentUser?.id && f.status !== 'Pago');
+    const nextPayment = pendingFinancials.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0];
 
-  // Calcular média geral
-  const averageGrades = studentGrades.filter(g => g.finalAverage);
-  const generalAverage = averageGrades.length > 0
-    ? (averageGrades.reduce((acc, g) => acc + (g.finalAverage || 0), 0) / averageGrades.length).toFixed(1)
-    : '0.0';
+    // Próximas Avaliações
+    const upcomingExams = events
+        .filter(e => e.type === 'Prova' && new Date(e.date) >= new Date())
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const nextExam = upcomingExams[0];
 
-  // Determinar situação geral
-  const getOverallStatus = () => {
-    if (studentGrades.length === 0) return 'Sem Notas';
-    const hasReprovado = studentGrades.some(g => g.status === 'Reprovado');
-    const hasEmCurso = studentGrades.some(g => g.status === 'Em Curso');
+    // Últimos Comunicados
+    const announcements = getVisibleAnnouncements();
+    const latestAnnouncement = announcements[0];
+    const hasUnread = announcements.some(a => !a.readBy.includes(currentUser?.id || ''));
 
-    if (hasReprovado) return 'Reprovado';
-    if (hasEmCurso) return 'Cursando';
-    return 'Aprovado';
-  };
-
-  const overallStatus = getOverallStatus();
-
-  // Mapear ícones por disciplina
-  const getSubjectIcon = (subjectId: string) => {
-    const icons: { [key: string]: string } = {
-      'TEOLOGIA_SISTEMATICA': 'book',
-      'HISTORIA_IGREJA': 'history_edu',
-      'GREGO': 'translate',
-      'TEOLOGIA_PASTORAL': 'church',
-      'default': 'school'
-    };
-    return icons[subjectId] || icons.default;
-  };
-
-  // Mapear nomes de disciplinas
-  const getSubjectName = (subjectId: string) => {
-    const names: { [key: string]: string } = {
-      'TEOLOGIA_SISTEMATICA': 'Teologia Sistemática I',
-      'HISTORIA_IGREJA': 'História da Igreja',
-      'GREGO': 'Grego I',
-      'TEOLOGIA_PASTORAL': 'Teologia Pastoral',
-      'sub1': 'Teologia Sistemática I',
-      'sub2': 'História da Igreja'
-    };
-    return names[subjectId] || 'Disciplina';
-  };
-
-  return (
-    <div className="pb-24 min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white p-4 sticky top-0 z-10 border-b border-gray-200 flex justify-between items-center">
-        <img
-          src={currentUser?.avatarUrl}
-          alt="Profile"
-          className="w-10 h-10 rounded-full object-cover"
-        />
-        <h1 className="font-bold text-lg text-gray-900">Meu Boletim</h1>
-        <button onClick={() => navigate('/notifications')} className="text-gray-600">
-          <span className="material-symbols-outlined">notifications</span>
-        </button>
-      </div>
-
-      <div className="p-4 space-y-4">
-        {/* Filtros de Período */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          {['2024/2', '2024/1', '2023/2', '2023/1'].map((period) => (
-            <button
-              key={period}
-              onClick={() => setSelectedPeriod(period)}
-              className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${selectedPeriod === period
-                  ? 'bg-primary text-white'
-                  : 'bg-white text-gray-700 border border-gray-200'
-                }`}
-            >
-              {period}
-            </button>
-          ))}
-        </div>
-
-        {/* Cards de Resumo */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-600 mb-1">Média Geral</p>
-            <p className="text-3xl font-bold text-gray-900">{generalAverage}</p>
-          </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <p className="text-sm text-gray-600 mb-1">Situação</p>
-            <p className={`text-2xl font-bold ${overallStatus === 'Aprovado' ? 'text-green-600' :
-                overallStatus === 'Cursando' ? 'text-primary' :
-                  overallStatus === 'Reprovado' ? 'text-red-600' :
-                    'text-gray-400'
-              }`}>
-              {overallStatus}
-            </p>
-          </div>
-        </div>
-
-        {/* Detalhes por Disciplina */}
-        <div>
-          <h2 className="text-lg font-bold text-gray-900 mb-3">Detalhes por Disciplina</h2>
-          <div className="space-y-3">
-            {studentGrades.length === 0 ? (
-              <div className="bg-white p-6 rounded-xl border border-gray-200 text-center">
-                <p className="text-gray-500">Nenhuma nota lançada ainda para este período.</p>
-              </div>
-            ) : (
-              studentGrades.map((grade, index) => (
-                <div key={index} className="bg-white p-4 rounded-xl border border-gray-200 flex gap-3">
-                  {/* Ícone da Disciplina */}
-                  <div className="bg-gray-100 w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined text-gray-600 text-2xl">
-                      {getSubjectIcon(grade.subjectId)}
-                    </span>
-                  </div>
-
-                  {/* Conteúdo */}
-                  <div className="flex-1">
-                    <h3 className="font-bold text-gray-900 mb-1">
-                      {getSubjectName(grade.subjectId)}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-1">
-                      N1: {grade.n1?.toFixed(1) || '-'}, N2: {grade.n2?.toFixed(1) || '-'}
-                    </p>
-                    <p className="text-sm text-gray-900">
-                      Média Final: <span className="font-bold">{grade.finalAverage?.toFixed(1) || '-'}</span>
-                    </p>
-                  </div>
-
-                  {/* Badge de Status */}
-                  <div className="flex items-start">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${grade.status === 'Aprovado' ? 'bg-green-100 text-green-700' :
-                        grade.status === 'Em Curso' ? 'bg-blue-100 text-blue-700' :
-                          'bg-red-100 text-red-700'
-                      }`}>
-                      {grade.status === 'Em Curso' ? 'Cursando' : grade.status}
-                    </span>
-                  </div>
+    return (
+        <div className="pb-24 min-h-screen bg-gray-50">
+            {/* Header */}
+            <div className="bg-white p-4 sticky top-0 z-10 flex justify-between items-center shadow-sm">
+                <div className="flex items-center gap-3">
+                    <img
+                        src={currentUser?.avatarUrl}
+                        alt="Profile"
+                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+                    />
+                    <div>
+                        <h1 className="font-bold text-xl text-gray-900">Olá, {currentUser?.name?.split(' ')[0]}!</h1>
+                    </div>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
+                <button onClick={() => navigate('/notifications')} className="relative text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <span className="material-symbols-outlined">notifications</span>
+                    {hasUnread && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>}
+                </button>
+            </div>
 
-      <BottomNav />
-    </div>
-  );
+            <div className="p-4 space-y-4">
+                {/* Card Financeiro */}
+                <div
+                    onClick={() => navigate('/student/financial')}
+                    className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 active:scale-98 transition-transform cursor-pointer"
+                >
+                    <h2 className="text-red-400 font-medium text-sm mb-2">Situação Financeira</h2>
+                    {pendingFinancials.length > 0 ? (
+                        <>
+                            <p className="text-xl font-bold text-gray-900 mb-1">
+                                {pendingFinancials.length} {pendingFinancials.length === 1 ? 'mensalidade pendente' : 'mensalidades pendentes'}
+                            </p>
+                            {nextPayment && (
+                                <p className="text-sm text-gray-500 mb-3">
+                                    Vencimento em {new Date(nextPayment.dueDate).toLocaleDateString('pt-BR')}
+                                </p>
+                            )}
+                            <p className="text-sm text-gray-400">Clique para ver detalhes e gerar boleto</p>
+                        </>
+                    ) : (
+                        <div className="flex items-center gap-2 text-green-600">
+                            <span className="material-symbols-outlined">check_circle</span>
+                            <p className="font-bold">Tudo em dia!</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Card Avaliações */}
+                <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h2 className="text-orange-400 font-medium text-sm mb-2">Próximas Avaliações</h2>
+                    {nextExam ? (
+                        <>
+                            <p className="text-xl font-bold text-gray-900 mb-1">{nextExam.title}</p>
+                            <p className="text-sm text-gray-500 mb-3">
+                                Data: {new Date(nextExam.date).toLocaleDateString('pt-BR')}
+                            </p>
+                            <p className="text-sm text-gray-400">Clique para ver todas as avaliações</p>
+                        </>
+                    ) : (
+                        <p className="text-gray-500 font-medium">Nenhuma avaliação agendada.</p>
+                    )}
+                </div>
+
+                {/* Card Comunicados */}
+                <div
+                    onClick={() => navigate('/announcements')}
+                    className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 active:scale-98 transition-transform cursor-pointer"
+                >
+                    <div className="bg-gray-100 p-3 rounded-xl">
+                        <span className="material-symbols-outlined text-gray-600">campaign</span>
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="font-bold text-gray-900">Últimos Comunicados</h3>
+                        <p className="text-sm text-gray-500 line-clamp-1">
+                            {latestAnnouncement ? latestAnnouncement.title : 'Nenhum comunicado recente'}
+                        </p>
+                    </div>
+                    {hasUnread && <div className="w-3 h-3 bg-green-500 rounded-full"></div>}
+                </div>
+
+                {/* Grid de Acesso Rápido */}
+                <div className="grid grid-cols-2 gap-4">
+                    <button
+                        onClick={() => navigate('/student/grades')}
+                        className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-start gap-3 hover:shadow-md transition-shadow"
+                    >
+                        <span className="material-symbols-outlined text-blue-600 text-3xl">school</span>
+                        <div className="text-left">
+                            <p className="font-bold text-gray-900">Acadêmico</p>
+                            <p className="text-xs text-gray-500">Notas e faltas</p>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => navigate('/student/financial')}
+                        className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-start gap-3 hover:shadow-md transition-shadow"
+                    >
+                        <span className="material-symbols-outlined text-blue-600 text-3xl">payments</span>
+                        <div className="text-left">
+                            <p className="font-bold text-gray-900">Financeiro</p>
+                            <p className="text-xs text-gray-500">Boletos e extratos</p>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => navigate('/student/agenda')}
+                        className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-start gap-3 hover:shadow-md transition-shadow"
+                    >
+                        <span className="material-symbols-outlined text-blue-600 text-3xl">calendar_month</span>
+                        <div className="text-left">
+                            <p className="font-bold text-gray-900">Agenda</p>
+                            <p className="text-xs text-gray-500">Aulas e eventos</p>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => navigate('/announcements')}
+                        className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-start gap-3 hover:shadow-md transition-shadow"
+                    >
+                        <span className="material-symbols-outlined text-blue-600 text-3xl">description</span>
+                        <div className="text-left">
+                            <p className="font-bold text-gray-900">Comunicados</p>
+                            <p className="text-xs text-gray-500">Avisos importantes</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <BottomNav />
+        </div>
+    );
 };
 
 export default StudentDashboard;

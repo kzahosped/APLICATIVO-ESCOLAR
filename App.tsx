@@ -8,6 +8,7 @@ import { UserRole } from './types';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import StudentDashboard from './pages/StudentDashboard';
+import StudentGrades from './pages/StudentGrades';
 import ProfessorDashboard from './pages/ProfessorDashboard';
 import Announcements from './pages/Announcements';
 import Financials from './pages/Financials';
@@ -53,6 +54,7 @@ const MainRouter = () => {
 
       {/* Student Routes */}
       <Route path="/student" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentDashboard /></ProtectedRoute>} />
+      <Route path="/student/grades" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentGrades /></ProtectedRoute>} />
       <Route path="/student/financial" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><Financials /></ProtectedRoute>} />
       <Route path="/student/agenda" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><Agenda /></ProtectedRoute>} />
       <Route path="/student/support" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><Support /></ProtectedRoute>} />
