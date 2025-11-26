@@ -19,6 +19,7 @@ import GradeEntry from './pages/GradeEntry';
 import Notifications from './pages/Notifications';
 import Agenda from './pages/Agenda';
 import Support from './pages/Support';
+import LandingPage from './pages/LandingPage';
 
 const ProtectedRoute = ({ children, allowedRoles }: { children?: React.ReactNode, allowedRoles: UserRole[] }) => {
   const { currentUser } = useApp();
@@ -32,13 +33,16 @@ const MainRouter = () => {
 
   return (
     <Routes>
-      <Route path="/" element={
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={
         currentUser ? (
           currentUser.role === UserRole.ADMIN ? <Navigate to="/admin" /> :
             currentUser.role === UserRole.PROFESSOR ? <Navigate to="/professor" /> :
               <Navigate to="/student" />
         ) : <Login />
       } />
+      <Route path="/debug" element={<Debug />} />
 
       {/* Admin Routes */}
       <Route path="/admin" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AdminDashboard /></ProtectedRoute>} />
@@ -61,7 +65,6 @@ const MainRouter = () => {
       <Route path="/announcements" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PROFESSOR, UserRole.STUDENT]}><Announcements /></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PROFESSOR, UserRole.STUDENT]}><Notifications /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PROFESSOR, UserRole.STUDENT]}><Settings /></ProtectedRoute>} />
-      <Route path="/debug" element={<Debug />} /> {/* Added Debug route */}
     </Routes>
   );
 };
