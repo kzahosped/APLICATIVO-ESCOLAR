@@ -76,6 +76,7 @@ export interface FinancialRecord {
   status: 'Pago' | 'Pendente' | 'Vencido' | 'Parcial';
   category: string; // Agora será customizável
   paidAt?: string;
+  discount?: number; // Novo campo para desconto
   payments?: Payment[]; // Lista de pagamentos
   balance?: number; // Saldo restante = amount - soma(payments)
 }
