@@ -46,15 +46,32 @@ export interface Grade {
   published: boolean; // Regra: Aluno só vê se true
 }
 
+export interface Payment {
+  id: string;
+  amount: number;
+  date: string;
+  method: 'Dinheiro' | 'PIX' | 'Cartão' | 'Transferência';
+  notes?: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  type: 'income' | 'expense';
+  createdAt: string;
+}
+
 export interface FinancialRecord {
   id: string;
   studentId: string;
   description: string;
   amount: number;
   dueDate: string;
-  status: 'Pago' | 'Pendente' | 'Vencido';
-  category: 'Mensalidade' | 'Material' | 'Cantina' | 'Livraria' | 'Outros';
+  status: 'Pago' | 'Pendente' | 'Vencido' | 'Parcial';
+  category: string; // Agora será customizável
   paidAt?: string;
+  payments?: Payment[]; // Lista de pagamentos
+  balance?: number; // Saldo restante = amount - soma(payments)
 }
 
 export interface Announcement {
