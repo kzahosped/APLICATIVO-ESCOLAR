@@ -258,14 +258,22 @@ export const initializeDefaultData = async () => {
 
         console.log(`📊 Users collection has ${snapshot.size} documents`);
 
-        if (snapshot.empty) {
-            console.log('⚠️ No users found. Initializing default data...');
+        console.log(`📊 Users collection has ${snapshot.size} documents`);
 
-            // Add default users
-            for (const user of INITIAL_USERS) {
-                await setDoc(doc(usersRef, user.id), user);
-                console.log(`✅ Default user created: ${user.email}`);
+        // Check and ensure all INITIAL_USERS exist
+        for (const user of INITIAL_USERS) {
+            const userDocRef = doc(usersRef, user.id);
+            const userDocSnap = await getDocs(query(usersRef, where('email', '==', user.email)));
+
+            // Check by ID or Email to avoid duplicates
+            if (userDocSnap.empty) {
+                await setDoc(userDocRef, user);
+                console.log(`✅ Default user created/restored: ${user.email}`);
             }
+        }
+
+        if (snapshot.empty) {
+            console.log('⚠️ No users found. Initializing default events...');
 
             // Add default events
             const eventsRef = collection(db, 'events');
@@ -275,7 +283,7 @@ export const initializeDefaultData = async () => {
 
             console.log('✅ Default data initialization complete!');
         } else {
-            console.log('✅ Data already exists. Skipping initialization.');
+            console.log('✅ Users checked. Skipping full initialization.');
         }
     } catch (error) {
         console.error('❌ Error initializing default data:', error);

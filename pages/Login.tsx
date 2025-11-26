@@ -148,15 +148,17 @@ const Login: React.FC = () => {
           <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">Entre com suas credenciais</h2>
 
           <form onSubmit={handleLogin} className="space-y-5">
-            {/* Email Input */}
+            {/* Login Input (Email or CPF) */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Login (CPF)</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                {selectedRole === UserRole.STUDENT ? 'Login (CPF)' : 'E-mail'}
+              </label>
               <input
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all"
-                placeholder="Digite seu CPF"
+                placeholder={selectedRole === UserRole.STUDENT ? 'Digite seu CPF' : 'Digite seu e-mail'}
                 required
               />
             </div>

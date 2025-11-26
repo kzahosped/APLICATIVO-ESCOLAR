@@ -11,6 +11,15 @@ export const INITIAL_USERS: User[] = [
         bio: 'Gestão Geral'
     },
     {
+        id: 'admin-2',
+        name: 'Super Admin',
+        email: 'Admin@gmail.com',
+        password: 'Admin313',
+        role: UserRole.ADMIN,
+        avatarUrl: 'https://ui-avatars.com/api/?name=Super+Admin&background=0D8ABC&color=fff',
+        bio: 'Administrador Principal'
+    },
+    {
         id: '2',
         name: 'Prof. João',
         email: 'prof@escola.com',
