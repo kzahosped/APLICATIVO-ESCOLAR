@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
 import BottomNav from '../components/BottomNav';
 import { UserRole } from '../types';
+import { INITIAL_CATEGORIES } from '../constants/initialData';
 
 const Financials: React.FC = () => {
   const navigate = useNavigate();
@@ -15,7 +16,7 @@ const Financials: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
-  const [category, setCategory] = useState('Mensalidade');
+  const [category, setCategory] = useState('Mensalidade do curso');
 
   const allRecords = getVisibleFinancials();
 
@@ -117,8 +118,8 @@ const Financials: React.FC = () => {
               key={year}
               onClick={() => setSelectedYear(year)}
               className={`flex-1 py-1.5 text-sm font-bold rounded-md transition-all ${selectedYear === year
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
                 }`}
             >
               {year}
@@ -145,8 +146,8 @@ const Financials: React.FC = () => {
                       {getMonthYear(record.dueDate)}
                     </h3>
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${record.status === 'Pago' ? 'bg-green-100 text-green-700' :
-                        record.status === 'Vencido' ? 'bg-red-100 text-red-700' :
-                          'bg-orange-100 text-orange-700'
+                      record.status === 'Vencido' ? 'bg-red-100 text-red-700' :
+                        'bg-orange-100 text-orange-700'
                       }`}>
                       {record.status}
                     </span>
@@ -169,8 +170,8 @@ const Financials: React.FC = () => {
                     <div className="flex justify-between items-center pt-2 border-t border-gray-100">
                       <span className="font-bold text-gray-700">Valor Final:</span>
                       <span className={`text-xl font-bold ${record.status === 'Pago' ? 'text-green-600' :
-                          record.status === 'Vencido' ? 'text-red-600' :
-                            'text-orange-500'
+                        record.status === 'Vencido' ? 'text-red-600' :
+                          'text-orange-500'
                         }`}>
                         R$ {finalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
@@ -217,11 +218,33 @@ const Financials: React.FC = () => {
                 <option value="">Selecione o Aluno</option>
                 {users.filter(u => u.role === UserRole.STUDENT).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
               </select>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full p-3 border rounded-lg">
-                <option value="Mensalidade">Mensalidade</option>
-                <option value="Cantina">Cantina</option>
-                <option value="Livraria">Livraria</option>
+              <select
+                value={INITIAL_CATEGORIES.some(c => c.name === category) ? category : 'Outro'}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === 'Outro') {
+                    setCategory('');
+                  } else {
+                    setCategory(val);
+                  }
+                }}
+                className="w-full p-3 border rounded-lg"
+              >
+                {INITIAL_CATEGORIES.map(cat => (
+                  <option key={cat.id} value={cat.name}>{cat.name}</option>
+                ))}
+                <option value="Outro">Outro (Personalizado)</option>
               </select>
+
+              {(!INITIAL_CATEGORIES.some(c => c.name === category) || category === '') && (
+                <input
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  placeholder="Digite a categoria personalizada"
+                  className="w-full p-3 border rounded-lg bg-gray-50"
+                  autoFocus
+                />
+              )}
               <input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descrição" className="w-full p-3 border rounded-lg" />
               <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Valor (R$)" className="w-full p-3 border rounded-lg" />
               <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="w-full p-3 border rounded-lg" />
