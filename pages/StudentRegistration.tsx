@@ -6,103 +6,216 @@ import { UserRole } from '../types';
 const StudentRegistration: React.FC = () => {
   const navigate = useNavigate();
   const { addUser } = useApp();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState<UserRole>(UserRole.STUDENT);
-  const [registrationId, setRegistrationId] = useState('');
 
-  const handleSubmit = () => {
-    if (name && email && password) {
-      const generatedId = registrationId || Date.now().toString().slice(-6);
-      addUser({
+  // Dados Pessoais
+  const [name, setName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [cpf, setCpf] = useState('');
+  const [rg, setRg] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+
+  // Dados Acadêmicos
+  const [course, setCourse] = useState('');
+  const [classId, setClassId] = useState('');
+  const [enrollmentYear, setEnrollmentYear] = useState('');
+
+  // Máscara para CPF: 000.000.000-00
+  const maskCPF = (value: string) => {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1');
+  };
+
+  // Máscara para RG: 00.000.000-0
+  const maskRG = (value: string) => {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1})/, '$1-$2')
+      .replace(/(-\d{1})\d+?$/, '$1');
+  };
+
+  // Máscara para Telefone: (00) 00000-0000
+  const maskPhone = (value: string) => {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '($1) $2')
+      .replace(/(\d{5})(\d)/, '$1-$2')
+      .replace(/(-\d{4})\d+?$/, '$1');
+  };
+
+  // Máscara para Data: DD/MM/AAAA
+  const maskDate = (value: string) => {
+    return value
+      .replace(/\D/g, '')
+      .replace(/(\d{2})(\d)/, '$1/$2')
+      .replace(/(\d{2})(\d)/, '$1/$2')
+      .replace(/(\/\d{4})\d+?$/, '$1');
+  };
+
+  const handleSubmit = async () => {
+    if (name && email && cpf && rg && course && classId && enrollmentYear) {
+      await addUser({
         id: Date.now().toString(),
         name,
         email,
-        password,
-        role,
-        registrationId: generatedId,
-        avatarUrl: `https://ui-avatars.com/api/?name=${name}&background=random`
-      });
+        password: '123456', // Senha padrão inicial
+        role: UserRole.STUDENT,
+        registrationId: Date.now().toString().slice(-6),
+        avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+        courseId: course,
+        classId: classId,
+        // Campos adicionais que podem ser armazenados em um objeto extra se necessário
+        birthDate,
+        cpf,
+        rg,
+        phone,
+        enrollmentYear
+      } as any);
       navigate('/admin/users');
     }
   };
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark">
-      <div className="bg-white dark:bg-[#111621] p-4 sticky top-0 z-10 border-b border-gray-200 dark:border-gray-800 flex items-center gap-2">
-        <button onClick={() => navigate(-1)} className="text-gray-600 dark:text-gray-300">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white p-4 sticky top-0 z-10 border-b border-gray-200 flex items-center gap-3">
+        <button onClick={() => navigate(-1)} className="text-gray-600">
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h1 className="font-bold text-lg text-gray-900 dark:text-white">Cadastrar Novo Usuário</h1>
+        <h1 className="font-bold text-lg text-gray-900">Cadastrar Novo Aluno</h1>
       </div>
 
-      <div className="p-4 space-y-6 max-w-lg mx-auto">
-        <div className="space-y-4">
+      <div className="p-4 max-w-lg mx-auto space-y-6">
+        {/* Dados Pessoais */}
+        <div className="bg-white rounded-lg p-4 space-y-4">
+          <h2 className="font-bold text-gray-900 text-sm">Dados Pessoais</h2>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo de Usuário</label>
-            <select 
-              value={role}
-              onChange={(e) => setRole(e.target.value as UserRole)}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white"
+            <label className="block text-gray-700 text-sm mb-2">Nome Completo</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Insira o nome completo do aluno"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">Data de Nascimento</label>
+            <input
+              type="text"
+              value={birthDate}
+              onChange={(e) => setBirthDate(maskDate(e.target.value))}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="DD/MM/AAAA"
+              maxLength={10}
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">CPF</label>
+            <input
+              type="text"
+              value={cpf}
+              onChange={(e) => setCpf(maskCPF(e.target.value))}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="000.000.000-00"
+              maxLength={14}
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">RG</label>
+            <input
+              type="text"
+              value={rg}
+              onChange={(e) => setRg(maskRG(e.target.value))}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="00.000.000-0"
+              maxLength={12}
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">E-mail</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="exemplo@dominio.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">Telefone</label>
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(maskPhone(e.target.value))}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="(00) 00000-0000"
+              maxLength={15}
+            />
+          </div>
+        </div>
+
+        {/* Dados Acadêmicos */}
+        <div className="bg-white rounded-lg p-4 space-y-4">
+          <h2 className="font-bold text-gray-900 text-sm">Dados Acadêmicos</h2>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">Curso</label>
+            <select
+              value={course}
+              onChange={(e) => setCourse(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
             >
-              <option value={UserRole.STUDENT}>Aluno</option>
-              <option value={UserRole.PROFESSOR}>Professor</option>
-              <option value={UserRole.ADMIN}>Administrador</option>
+              <option value="">Selecione um curso</option>
+              <option value="TEOLOGIA">Teologia</option>
+              <option value="MINISTERIAL">Ministerial</option>
+              <option value="MISSIONARIO">Missionário</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome Completo</label>
-            <input 
-              type="text" 
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white"
-              placeholder="Ex: Maria Silva"
-            />
+            <label className="block text-gray-700 text-sm mb-2">Turma</label>
+            <select
+              value={classId}
+              onChange={(e) => setClassId(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+            >
+              <option value="">Selecione uma turma</option>
+              <option value="1ANO">1º Ano</option>
+              <option value="2ANO">2º Ano</option>
+              <option value="3ANO">3º Ano</option>
+            </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">E-mail</label>
-            <input 
-              type="email" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white"
-              placeholder="Ex: maria@escola.com"
+            <label className="block text-gray-700 text-sm mb-2">Ano/Semestre de Ingresso</label>
+            <input
+              type="text"
+              value={enrollmentYear}
+              onChange={(e) => setEnrollmentYear(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Ex: 2024/2"
             />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Senha de Acesso</label>
-            <input 
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white"
-              placeholder="Defina uma senha"
-            />
-          </div>
-
-          {role === UserRole.STUDENT && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Matrícula (Opcional)</label>
-              <input 
-                type="text" 
-                value={registrationId}
-                onChange={(e) => setRegistrationId(e.target.value)}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white"
-                placeholder="Gerado automaticamente se vazio"
-              />
-            </div>
-          )}
         </div>
 
-        <button 
+        {/* Botão Salvar */}
+        <button
           onClick={handleSubmit}
-          disabled={!name || !email || !password}
-          className="w-full bg-primary text-white py-3 rounded-xl font-bold text-lg shadow-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!name || !email || !cpf || !rg || !course || !classId || !enrollmentYear}
+          className="w-full bg-primary text-white py-4 rounded-lg font-bold text-base shadow-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Salvar Cadastro
         </button>

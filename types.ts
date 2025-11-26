@@ -20,6 +20,12 @@ export interface User {
   // Novos campos para targeting
   courseId?: string;
   classId?: string;
+  // Campos adicionais de cadastro
+  cpf?: string;
+  rg?: string;
+  phone?: string;
+  birthDate?: string;
+  enrollmentYear?: string;
 }
 
 export interface Course {
