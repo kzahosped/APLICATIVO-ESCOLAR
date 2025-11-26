@@ -12,7 +12,6 @@ const StudentRegistration: React.FC = () => {
   const [birthDate, setBirthDate] = useState('');
   const [cpf, setCpf] = useState('');
   const [rg, setRg] = useState('');
-  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
 
   // Dados Acadêmicos
@@ -59,18 +58,21 @@ const StudentRegistration: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (name && email && cpf && rg && course && classId && enrollmentYear) {
+    if (name && cpf && rg && course && classId && enrollmentYear) {
+      // Remove máscara do CPF para usar como login/senha
+      const cpfClean = cpf.replace(/\D/g, '');
+
       await addUser({
         id: Date.now().toString(),
         name,
-        email,
-        password: '123456', // Senha padrão inicial
+        email: cpfClean, // CPF sem máscara como login
+        password: cpfClean, // CPF sem máscara como senha
         role: UserRole.STUDENT,
         registrationId: Date.now().toString().slice(-6),
         avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
         courseId: course,
         classId: classId,
-        // Campos adicionais que podem ser armazenados em um objeto extra se necessário
+        // Campos adicionais
         birthDate,
         cpf,
         rg,
@@ -144,17 +146,6 @@ const StudentRegistration: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-gray-700 text-sm mb-2">E-mail</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="exemplo@dominio.com"
-            />
-          </div>
-
-          <div>
             <label className="block text-gray-700 text-sm mb-2">Telefone</label>
             <input
               type="text"
@@ -214,7 +205,7 @@ const StudentRegistration: React.FC = () => {
         {/* Botão Salvar */}
         <button
           onClick={handleSubmit}
-          disabled={!name || !email || !cpf || !rg || !course || !classId || !enrollmentYear}
+          disabled={!name || !cpf || !rg || !course || !classId || !enrollmentYear}
           className="w-full bg-primary text-white py-4 rounded-lg font-bold text-base shadow-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Salvar Cadastro
