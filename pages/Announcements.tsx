@@ -1,33 +1,71 @@
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
 import BottomNav from '../components/BottomNav';
 import { UserRole } from '../types';
 
+interface AttachedFile {
+  name: string;
+  size: number;
+  file: File;
+}
+
 const Announcements: React.FC = () => {
+  const navigate = useNavigate();
   const { getVisibleAnnouncements, addAnnouncement, removeAnnouncement, markAnnouncementAsRead, currentUser } = useApp();
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [targetType, setTargetType] = useState<'GLOBAL' | 'CLASS'>('GLOBAL');
+  const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
 
   const announcements = getVisibleAnnouncements();
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      const validFiles = files.filter(file => {
+        const isValidType = file.type === 'application/pdf' ||
+          file.type.startsWith('image/');
+        const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB
+        return isValidType && isValidSize;
+      });
+
+      const newAttachments = validFiles.map(file => ({
+        name: file.name,
+        size: file.size,
+        file
+      }));
+
+      setAttachedFiles([...attachedFiles, ...newAttachments]);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setAttachedFiles(attachedFiles.filter((_, i) => i !== index));
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
   const handlePublish = () => {
     if (!title || !content) return;
-    
+
     addAnnouncement({
       title,
       content,
       date: new Date().toLocaleDateString('pt-BR'),
       type: 'Geral',
-      targetType: targetType,
-      targetId: targetType === 'CLASS' ? 'TURMA_A' : undefined // Simplificado para demo
+      targetType: 'GLOBAL',
+      targetId: undefined
     });
-    
+
     setShowModal(false);
     setTitle('');
     setContent('');
+    setAttachedFiles([]);
   };
 
   const canManage = currentUser?.role === UserRole.ADMIN || currentUser?.role === UserRole.PROFESSOR;
@@ -47,8 +85,8 @@ const Announcements: React.FC = () => {
         {announcements.map((ann) => {
           const isRead = currentUser ? ann.readBy.includes(currentUser.id) : false;
           return (
-            <div 
-              key={ann.id} 
+            <div
+              key={ann.id}
               onClick={() => !isRead && markAnnouncementAsRead(ann.id)}
               className={`bg-white dark:bg-[#1a202c] p-4 rounded-xl border shadow-sm transition-all ${isRead ? 'border-gray-200 dark:border-gray-700' : 'border-blue-300 dark:border-blue-700 ring-1 ring-blue-100 dark:ring-blue-900'}`}
             >
@@ -71,30 +109,101 @@ const Announcements: React.FC = () => {
         })}
       </div>
 
-      {/* Modal de Criação */}
+      {/* Modal de Criação - Redesigned */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-[#1a202c] w-full max-w-sm rounded-2xl p-6">
-            <h3 className="font-bold text-lg mb-4 dark:text-white">Novo Comunicado</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs text-gray-500">Destino</label>
-                <div className="flex gap-2 mt-1">
-                  <button onClick={() => setTargetType('GLOBAL')} className={`flex-1 py-2 text-xs font-bold rounded ${targetType === 'GLOBAL' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>GLOBAL</button>
-                  <button onClick={() => setTargetType('CLASS')} className={`flex-1 py-2 text-xs font-bold rounded ${targetType === 'CLASS' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>TURMA A</button>
-                </div>
-              </div>
-              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título" className="w-full p-3 border rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-white" />
-              <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Mensagem..." className="w-full p-3 border rounded-lg h-32 dark:bg-gray-800 dark:border-gray-600 dark:text-white" />
-              
-              <div className="flex gap-2 pt-2">
-                <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-gray-500 font-bold">Cancelar</button>
-                <button onClick={handlePublish} className="flex-1 py-3 bg-primary text-white rounded-lg font-bold shadow-lg">Publicar</button>
-              </div>
+        <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+          {/* Header */}
+          <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+            <button onClick={() => { setShowModal(false); setTitle(''); setContent(''); setAttachedFiles([]); }} className="text-gray-600">
+              <span className="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h1 className="font-bold text-lg text-gray-900">Novo Comunicado</h1>
+            <button
+              onClick={() => { setShowModal(false); setTitle(''); setContent(''); setAttachedFiles([]); }}
+              className="text-primary font-medium text-sm"
+            >
+              Cancelar
+            </button>
+          </div>
+
+          <div className="p-4 space-y-6">
+            {/* Título */}
+            <div>
+              <label className="block text-gray-900 font-medium mb-2">Título</label>
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Assunto do comunicado"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
+
+            {/* Mensagem */}
+            <div>
+              <label className="block text-gray-900 font-medium mb-2">Mensagem</label>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Digite o corpo do comunicado aqui..."
+                className="w-full p-3 border border-gray-300 rounded-lg h-40 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+              />
+            </div>
+
+            {/* Anexos */}
+            <div>
+              <label className="block text-gray-900 font-medium mb-2">Anexos</label>
+              <p className="text-xs text-gray-500 mb-3">
+                Limite de 5MB por arquivo. Tipos aceitos: PDF, JPG, PNG.
+              </p>
+
+              {/* Lista de Arquivos Anexados */}
+              <div className="space-y-2 mb-3">
+                {attachedFiles.map((file, index) => (
+                  <div key={index} className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg">
+                    <div className="bg-blue-100 p-2 rounded">
+                      <span className="material-symbols-outlined text-primary">
+                        {file.file.type === 'application/pdf' ? 'picture_as_pdf' : 'image'}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
+                      <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                    </div>
+                    <button onClick={() => removeFile(index)} className="text-gray-400 hover:text-red-500">
+                      <span className="material-symbols-outlined">close</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Botão Anexar Arquivo */}
+              <label className="block">
+                <input
+                  type="file"
+                  multiple
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <div className="border-2 border-dashed border-primary rounded-lg p-4 text-center cursor-pointer hover:bg-blue-50 transition-colors">
+                  <span className="material-symbols-outlined text-primary mb-1">attach_file</span>
+                  <p className="text-primary font-medium text-sm">Anexar Arquivo</p>
+                </div>
+              </label>
+            </div>
+
+            {/* Botão Enviar */}
+            <button
+              onClick={handlePublish}
+              disabled={!title || !content}
+              className="w-full bg-primary text-white py-4 rounded-lg font-bold text-base shadow-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Enviar Comunicado
+            </button>
           </div>
         </div>
       )}
+
       <BottomNav />
     </div>
   );
