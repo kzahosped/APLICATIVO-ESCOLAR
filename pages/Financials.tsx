@@ -121,7 +121,7 @@ const Financials: React.FC = () => {
 
         {/* Year Filter */}
         <div className="bg-gray-200 p-1 rounded-lg flex gap-1">
-          {['2026', '2025', '2024'].map(year => (
+          {['2026', '2025'].map(year => (
             <button
               key={year}
               onClick={() => setSelectedYear(year)}
