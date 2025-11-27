@@ -35,6 +35,7 @@ const BottomNav: React.FC = () => {
       { icon: 'group', label: 'Usuários', path: '/admin/users' },
       { icon: 'payments', label: 'Finanças', path: '/admin/financial' },
       { icon: 'campaign', label: 'Comunic.', path: '/announcements' },
+      { icon: 'settings', label: 'Config', path: '/settings' },
     ];
   };
 

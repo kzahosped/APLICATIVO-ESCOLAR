@@ -31,7 +31,7 @@ const Settings: React.FC = () => {
     }
   }, [currentUser]);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -47,19 +47,27 @@ const Settings: React.FC = () => {
       return;
     }
 
-    setUploading(true);
+    try {
+      setUploading(true);
 
-    // Converter para base64
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setUserAvatar(reader.result as string);
+      // Import dynamically to avoid issues if storage not init
+      const { storage } = await import('../services/firebase');
+      const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `avatars/${currentUser?.id}_${Date.now()}.${fileExt}`;
+      const storageRef = ref(storage, fileName);
+
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      setUserAvatar(downloadURL);
       setUploading(false);
-    };
-    reader.onerror = () => {
-      alert('Erro ao processar a imagem');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Erro ao fazer upload da imagem. Tente novamente.');
       setUploading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleSaveInstitution = () => {
