@@ -5,12 +5,12 @@ import { getAuth } from 'firebase/auth';
 // Configuração do Firebase
 // INSTRUÇÕES: Substitua os valores abaixo pelas suas credenciais do Firebase
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "SUA_API_KEY_AQUI",
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "seu-projeto.firebaseapp.com",
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "seu-projeto",
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "seu-projeto.appspot.com",
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:123456789:web:abcdef"
+    apiKey: "AIzaSyAsyS-7xMJjvykJqo1tzye4VPE-JGVH2cI",
+    authDomain: "sistema-escolar-sdc.firebaseapp.com",
+    projectId: "sistema-escolar-sdc",
+    storageBucket: "sistema-escolar-sdc.firebasestorage.app",
+    messagingSenderId: "40055006162",
+    appId: "1:40055006162:web:6bb2c82c350e893c435e0b"
 };
 
 console.log('🔥 Firebase Config Check:', {
