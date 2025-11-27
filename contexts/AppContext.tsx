@@ -32,6 +32,7 @@ interface AppContextType {
 
   addFinancialRecord: (record: FinancialRecord) => Promise<void>;
   payRecord: (id: string) => Promise<void>;
+  deleteFinancialRecord: (id: string) => Promise<void>;
 
   createTicket: (ticket: Omit<Ticket, 'id' | 'studentId' | 'status' | 'history' | 'createdAt'>) => Promise<void>;
   updateTicketStatus: (id: string, status: Ticket['status'], comment?: string) => Promise<void>;
@@ -269,6 +270,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setFinancials(prev => prev.map(r =>
       r.id === id ? { ...r, ...updatedData } : r
     ));
+  };
+
+  const deleteFinancialRecord = async (id: string) => {
+    await firestoreService.deleteFinancialRecord(id);
+    setFinancials(prev => prev.filter(r => r.id !== id));
   };
 
   // --- TICKETS ---

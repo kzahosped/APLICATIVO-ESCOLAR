@@ -134,6 +134,16 @@ export const updateFinancialRecord = async (recordId: string, data: Partial<Fina
     }
 };
 
+export const deleteFinancialRecord = async (recordId: string) => {
+    try {
+        await deleteDoc(doc(db, FINANCIALS_COLLECTION, recordId));
+        return true;
+    } catch (error) {
+        console.error('Error deleting financial record:', error);
+        return false;
+    }
+};
+
 // ==================== GRADES ====================
 export const createGrade = async (grade: Grade) => {
     try {
