@@ -50,8 +50,25 @@ const Announcements: React.FC = () => {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  const handlePublish = () => {
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
+
+  const handlePublish = async () => {
     if (!title || !content) return;
+
+    const processedAttachments = await Promise.all(
+      attachedFiles.map(async (af) => ({
+        name: af.name,
+        type: af.file.type,
+        url: await convertFileToBase64(af.file)
+      }))
+    );
 
     addAnnouncement({
       title,
@@ -59,7 +76,8 @@ const Announcements: React.FC = () => {
       date: new Date().toLocaleDateString('pt-BR'),
       type: 'Geral',
       targetType: 'GLOBAL',
-      targetId: undefined
+      targetId: undefined,
+      attachments: processedAttachments
     });
 
     setShowModal(false);
@@ -127,6 +145,32 @@ const Announcements: React.FC = () => {
                 </div>
                 <h3 className="font-bold text-gray-900 dark:text-white mb-1">{ann.title}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{ann.content}</p>
+
+                {/* Attachments Display */}
+                {ann.attachments && ann.attachments.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    {ann.attachments.map((att, idx) => (
+                      <a
+                        key={idx}
+                        href={att.url}
+                        download={att.name}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors group"
+                      >
+                        <div className="bg-blue-100 dark:bg-blue-900/30 p-1.5 rounded">
+                          <span className="material-symbols-outlined text-primary text-sm">
+                            {att.type.includes('pdf') ? 'picture_as_pdf' : 'image'}
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-700 dark:text-gray-300 flex-1 truncate group-hover:text-primary transition-colors">
+                          {att.name}
+                        </span>
+                        <span className="material-symbols-outlined text-gray-400 text-sm">download</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+
                 <p className="text-[10px] text-gray-400 mt-2">{ann.date}</p>
               </div>
             );
