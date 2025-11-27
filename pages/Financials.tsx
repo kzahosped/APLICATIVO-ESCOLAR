@@ -16,6 +16,7 @@ const Financials: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [discount, setDiscount] = useState('');
   const [category, setCategory] = useState('Mensalidade do curso');
 
   // PIX Modal State
@@ -62,13 +63,16 @@ const Financials: React.FC = () => {
         amount: parseFloat(amount),
         dueDate,
         status: 'Pendente',
-        category: category as any
+        category: category as any,
+        discount: discount ? parseFloat(discount) : 0,
+        createdAt: new Date().toISOString()
       });
       setShowModal(false);
       setAmount('');
       setDescription('');
       setDueDate('');
       setSelectedStudent('');
+      setDiscount('');
     }
   };
 
@@ -117,7 +121,7 @@ const Financials: React.FC = () => {
 
         {/* Year Filter */}
         <div className="bg-gray-200 p-1 rounded-lg flex gap-1">
-          {['2024', '2023', '2022'].map(year => (
+          {['2026', '2025', '2024'].map(year => (
             <button
               key={year}
               onClick={() => setSelectedYear(year)}
@@ -182,11 +186,28 @@ const Financials: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* Dates Section */}
+                  <div className="space-y-1 mb-3 text-xs text-gray-500">
+                    {record.createdAt && (
+                      <div className="flex justify-between">
+                        <span>📅 Lançamento:</span>
+                        <span className="font-medium">{new Date(record.createdAt).toLocaleDateString('pt-BR')}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <span>⏰ Vencimento:</span>
+                      <span className="font-medium">{new Date(record.dueDate).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                    {record.paidAt && (
+                      <div className="flex justify-between">
+                        <span>✅ Pagamento:</span>
+                        <span className="font-medium text-green-600">{new Date(record.paidAt).toLocaleDateString('pt-BR')}</span>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Card Footer */}
                   <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500">
-                      Vencimento: {new Date(record.dueDate).toLocaleDateString('pt-BR')}
-                    </span>
 
                     {currentUser?.role === UserRole.STUDENT && (
                       <>
