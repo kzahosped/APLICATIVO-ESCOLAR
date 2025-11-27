@@ -82,31 +82,56 @@ const Announcements: React.FC = () => {
       </div>
 
       <div className="p-4 space-y-4">
-        {announcements.map((ann) => {
-          const isRead = currentUser ? ann.readBy.includes(currentUser.id) : false;
-          return (
-            <div
-              key={ann.id}
-              onClick={() => !isRead && markAnnouncementAsRead(ann.id)}
-              className={`bg-white dark:bg-[#1a202c] p-4 rounded-xl border shadow-sm transition-all ${isRead ? 'border-gray-200 dark:border-gray-700' : 'border-blue-300 dark:border-blue-700 ring-1 ring-blue-100 dark:ring-blue-900'}`}
-            >
-              <div className="flex justify-between items-start mb-2">
-                <div className="flex gap-2">
-                  <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded uppercase font-bold">{ann.targetType}</span>
-                  {!isRead && <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded font-bold">NOVO</span>}
-                </div>
-                {canManage && (
-                  <button onClick={(e) => { e.stopPropagation(); removeAnnouncement(ann.id); }} className="text-gray-400 hover:text-red-500">
-                    <span className="material-symbols-outlined text-lg">delete</span>
-                  </button>
-                )}
-              </div>
-              <h3 className="font-bold text-gray-900 dark:text-white mb-1">{ann.title}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{ann.content}</p>
-              <p className="text-[10px] text-gray-400 mt-2">{ann.date}</p>
+        {announcements.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 px-4">
+            <div className="bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/20 dark:to-purple-900/20 w-24 h-24 rounded-full flex items-center justify-center mb-6">
+              <span className="material-symbols-outlined text-primary text-5xl">campaign</span>
             </div>
-          );
-        })}
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+              Nenhum aviso publicado
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 text-center mb-8 max-w-sm">
+              {canManage
+                ? "Comece criando o primeiro comunicado para sua comunidade"
+                : "Ainda não há comunicados disponíveis no momento"}
+            </p>
+            {canManage && (
+              <button
+                onClick={() => setShowModal(true)}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center gap-3"
+              >
+                <span className="material-symbols-outlined text-2xl">add_circle</span>
+                Criar Primeiro Aviso
+              </button>
+            )}
+          </div>
+        ) : (
+          announcements.map((ann) => {
+            const isRead = currentUser ? ann.readBy.includes(currentUser.id) : false;
+            return (
+              <div
+                key={ann.id}
+                onClick={() => !isRead && markAnnouncementAsRead(ann.id)}
+                className={`bg-white dark:bg-[#1a202c] p-4 rounded-xl border shadow-sm transition-all ${isRead ? 'border-gray-200 dark:border-gray-700' : 'border-blue-300 dark:border-blue-700 ring-1 ring-blue-100 dark:ring-blue-900'}`}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex gap-2">
+                    <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded uppercase font-bold">{ann.targetType}</span>
+                    {!isRead && <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded font-bold">NOVO</span>}
+                  </div>
+                  {canManage && (
+                    <button onClick={(e) => { e.stopPropagation(); removeAnnouncement(ann.id); }} className="text-gray-400 hover:text-red-500">
+                      <span className="material-symbols-outlined text-lg">delete</span>
+                    </button>
+                  )}
+                </div>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-1">{ann.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{ann.content}</p>
+                <p className="text-[10px] text-gray-400 mt-2">{ann.date}</p>
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* Modal de Criação - Redesigned */}
