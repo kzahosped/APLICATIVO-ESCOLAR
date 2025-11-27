@@ -11,14 +11,30 @@ const AdminDashboard: React.FC = () => {
   const totalStudents = users.filter(u => u.role === 'STUDENT').length;
   const totalRevenue = financials.reduce((acc, curr) => curr.status === 'Pago' ? acc + curr.amount : acc, 0);
 
-  // Dados do gráfico de fluxo de caixa - mostrando zero até haver movimentações
-  const data = [
-    { name: 'Jan', valor: 0 },
-    { name: 'Fev', valor: 0 },
-    { name: 'Mar', valor: 0 },
-    { name: 'Abr', valor: 0 },
-    { name: 'Mai', valor: 0 },
-  ];
+  // Calcular dados mensais do gráfico baseado nos lançamentos
+  const monthlyData = financials.reduce((acc, record) => {
+    if (record.status === 'Pago') {
+      const date = new Date(record.dueDate);
+      const month = date.getMonth(); // 0-11
+      const year = date.getFullYear();
+      const currentYear = new Date().getFullYear();
+
+      // Apenas dados do ano corrente
+      if (year === currentYear) {
+        if (!acc[month]) {
+          acc[month] = 0;
+        }
+        acc[month] += record.amount;
+      }
+    }
+    return acc;
+  }, {} as Record<number, number>);
+
+  const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  const data = monthNames.map((name, index) => ({
+    name,
+    valor: monthlyData[index] || 0
+  }));
 
   return (
     <div className="pb-24 min-h-screen bg-background-light dark:bg-background-dark">
