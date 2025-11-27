@@ -87,7 +87,45 @@ const LandingPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Features Section */}
+            {/* Quick Links - MOVED UP */}
+            <section className="relative z-10 py-20">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Explore Mais</h2>
+                        <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-600 mx-auto rounded-full"></div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {[
+                            { label: 'Quem Somos', url: 'https://www.seminariosdcsul.com.br/quem-somos', icon: 'info' },
+                            { label: 'Grade Curricular', url: 'https://www.seminariosdcsul.com.br/grade-curricular', icon: 'calendar_month' },
+                            { label: 'Professores', url: 'https://www.seminariosdcsul.com.br/professores', icon: 'person' },
+                            { label: 'Horários', url: 'https://www.seminariosdcsul.com.br/horarios', icon: 'schedule' },
+                            { label: 'Provas e Simulados', url: 'https://www.seminariosdcsul.com.br/provas-simulados', icon: 'quiz' },
+                            { label: 'Material Teológico', url: 'https://www.seminariosdcsul.com.br/material-teologico', icon: 'book' },
+                            { label: 'Fotos', url: 'https://www.seminariosdcsul.com.br/fotos', icon: 'photo_library' },
+                            { label: 'Vídeos', url: 'https://www.seminariosdcsul.com.br/videos', icon: 'play_circle' },
+                            { label: 'Localização', url: 'https://www.seminariosdcsul.com.br/localizacao', icon: 'location_on' },
+                            { label: 'Fale Conosco', url: 'https://www.seminariosdcsul.com.br/fale-conosco', icon: 'mail' },
+                        ].map((link, index) => (
+                            <a
+                                key={index}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group backdrop-blur-lg bg-white/10 border border-white/20 p-4 rounded-xl hover:bg-white/20 hover:border-white/40 transition-all flex flex-col items-center gap-3 text-center transform hover:scale-105"
+                            >
+                                <div className="bg-gradient-to-br from-blue-400 to-purple-600 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
+                                    <span className="material-symbols-outlined text-white text-2xl">{link.icon}</span>
+                                </div>
+                                <span className="font-medium text-white text-sm">{link.label}</span>
+                            </a>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Features Section - MOVED DOWN */}
             <section className="relative z-10 max-w-7xl mx-auto px-4 py-20">
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Por que escolher a SDC Sul?</h2>
@@ -113,42 +151,6 @@ const LandingPage: React.FC = () => {
                             </div>
                         </div>
                     ))}
-                </div>
-            </section>
-
-            {/* Quick Links */}
-            <section className="relative z-10 py-20">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Explore Mais</h2>
-                        <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-600 mx-auto rounded-full"></div>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {[
-                            { label: 'Quem Somos', url: 'https://www.seminariosdcsul.com.br/quem-somos', icon: 'info' },
-                            { label: 'Grade Curricular', url: 'https://www.seminariosdcsul.com.br/grade-curricular', icon: 'calendar_month' },
-                            { label: 'Professores', url: 'https://www.seminariosdcsul.com.br/professores', icon: 'person' },
-                            { label: 'Horários', url: 'https://www.seminariosdcsul.com.br/horarios', icon: 'schedule' },
-                            { label: 'Fotos', url: 'https://www.seminariosdcsul.com.br/fotos', icon: 'photo_library' },
-                            { label: 'Vídeos', url: 'https://www.seminariosdcsul.com.br/videos', icon: 'play_circle' },
-                            { label: 'Localização', url: 'https://www.seminariosdcsul.com.br/localizacao', icon: 'location_on' },
-                            { label: 'Fale Conosco', url: 'https://www.seminariosdcsul.com.br/fale-conosco', icon: 'mail' },
-                        ].map((link, index) => (
-                            <a
-                                key={index}
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="group backdrop-blur-lg bg-white/10 border border-white/20 p-4 rounded-xl hover:bg-white/20 hover:border-white/40 transition-all flex flex-col items-center gap-3 text-center transform hover:scale-105"
-                            >
-                                <div className="bg-gradient-to-br from-blue-400 to-purple-600 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
-                                    <span className="material-symbols-outlined text-white text-2xl">{link.icon}</span>
-                                </div>
-                                <span className="font-medium text-white text-sm">{link.label}</span>
-                            </a>
-                        ))}
-                    </div>
                 </div>
             </section>
 
