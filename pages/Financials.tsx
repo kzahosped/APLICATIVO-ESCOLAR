@@ -188,25 +188,29 @@ const Financials: React.FC = () => {
                       Vencimento: {new Date(record.dueDate).toLocaleDateString('pt-BR')}
                     </span>
 
-                    {record.status === 'Pago' ? (
-                      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors">
-                        Ver Comprovante
-                      </button>
-                    ) : record.status === 'Vencido' ? (
-                      <button className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700 transition-colors">
-                        Ver Detalhes
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          setSelectedPayment(record);
-                          setShowPixModal(true);
-                        }}
-                        className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition-colors flex items-center gap-2"
-                      >
-                        <span className="material-symbols-outlined text-lg">qr_code_2</span>
-                        Pagar Agora
-                      </button>
+                    {currentUser?.role === UserRole.STUDENT && (
+                      <>
+                        {record.status === 'Pago' ? (
+                          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors">
+                            Ver Comprovante
+                          </button>
+                        ) : record.status === 'Vencido' ? (
+                          <button className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700 transition-colors">
+                            Ver Detalhes
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setSelectedPayment(record);
+                              setShowPixModal(true);
+                            }}
+                            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition-colors flex items-center gap-2"
+                          >
+                            <span className="material-symbols-outlined text-lg">qr_code_2</span>
+                            Pagar Agora
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
