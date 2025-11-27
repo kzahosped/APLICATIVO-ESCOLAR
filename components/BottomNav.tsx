@@ -19,7 +19,7 @@ const BottomNav: React.FC = () => {
         { icon: 'home', label: 'Início', path: '/student' },
         { icon: 'calendar_month', label: 'Agenda', path: '/student/agenda' },
         { icon: 'notifications', label: 'Avisos', path: '/notifications', badge: unreadCount },
-        { icon: 'support_agent', label: 'Ajuda', path: '/student/support' },
+        { icon: 'settings', label: 'Config', path: '/settings' },
       ];
     }
     if (currentUser.role === UserRole.PROFESSOR) {
