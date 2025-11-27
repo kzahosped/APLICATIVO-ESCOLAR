@@ -18,6 +18,10 @@ const Financials: React.FC = () => {
   const [dueDate, setDueDate] = useState('');
   const [category, setCategory] = useState('Mensalidade do curso');
 
+  // PIX Modal State
+  const [showPixModal, setShowPixModal] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+
   const allRecords = getVisibleFinancials();
 
   // Filter records for the current student view
@@ -194,9 +198,13 @@ const Financials: React.FC = () => {
                       </button>
                     ) : (
                       <button
-                        onClick={() => currentUser?.role === UserRole.ADMIN && payRecord(record.id)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors"
+                        onClick={() => {
+                          setSelectedPayment(record);
+                          setShowPixModal(true);
+                        }}
+                        className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition-colors flex items-center gap-2"
                       >
+                        <span className="material-symbols-outlined text-lg">qr_code_2</span>
                         Pagar Agora
                       </button>
                     )}
@@ -252,6 +260,109 @@ const Financials: React.FC = () => {
             <div className="flex gap-3">
               <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-gray-500 font-bold">Cancelar</button>
               <button onClick={handleAddRecord} className="flex-1 py-3 bg-primary text-white rounded-lg font-bold">Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PIX Payment Modal */}
+      {showPixModal && selectedPayment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#1a202c] rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-green-500 to-green-600 p-5 rounded-t-2xl">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <span className="material-symbols-outlined">qr_code_2</span>
+                  Pagamento PIX
+                </h2>
+                <button
+                  onClick={() => setShowPixModal(false)}
+                  className="text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+                >
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Payment Info */}
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Descrição:</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{selectedPayment.description}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Vencimento:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">
+                    {new Date(selectedPayment.dueDate).toLocaleDateString('pt-BR')}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <span className="font-bold text-gray-700 dark:text-gray-300">Valor a Pagar:</span>
+                  <span className="text-2xl font-bold text-green-600">
+                    R$ {((selectedPayment.amount || 0) - (selectedPayment.discount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+
+              {/* QR Code */}
+              <div className="flex flex-col items-center space-y-4">
+                <div className="bg-white p-4 rounded-xl border-4 border-green-500 shadow-lg">
+                  <img
+                    src="/pix-qrcode.png"
+                    alt="QR Code PIX"
+                    className="w-48 h-48 object-contain"
+                  />
+                </div>
+                <p className="text-sm text-center text-gray-600 dark:text-gray-400">
+                  Aponte a câmera do seu aplicativo de banco para o QR Code
+                </p>
+              </div>
+
+              {/* PIX Info */}
+              <div className="space-y-3">
+                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+                  <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">CHAVE PIX:</p>
+                  <p className="text-sm font-bold text-blue-900 dark:text-blue-100">Igreja Evangélica Servos de Cristo</p>
+                </div>
+
+                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+                  <p className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-1">CNPJ:</p>
+                  <p className="text-sm font-bold text-purple-900 dark:text-purple-100">09.102.175/0001-84</p>
+                </div>
+              </div>
+
+              {/* Instructions */}
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+                <div className="flex gap-3">
+                  <span className="material-symbols-outlined text-yellow-600 text-2xl">info</span>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-2">Como pagar:</p>
+                    <ol className="text-xs text-yellow-800 dark:text-yellow-200 space-y-1 list-decimal list-inside">
+                      <li>Abra o app do seu banco</li>
+                      <li>Escolha a opção PIX</li>
+                      <li>Escaneie o QR Code acima</li>
+                      <li>Confirme o pagamento</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+
+              {/* Confirm Button */}
+              <button
+                onClick={() => {
+                  if (currentUser?.role === UserRole.ADMIN || confirm('Confirmar que o pagamento foi realizado?')) {
+                    payRecord(selectedPayment.id);
+                    setShowPixModal(false);
+                  }
+                }}
+                className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined">check_circle</span>
+                Já Paguei
+              </button>
             </div>
           </div>
         </div>
