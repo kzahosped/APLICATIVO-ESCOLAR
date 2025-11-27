@@ -42,8 +42,8 @@ const LandingPage: React.FC = () => {
                     <div className="mb-8 flex justify-center">
                         <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full blur-2xl opacity-50 animate-pulse"></div>
-                            <div className="relative bg-white/10 backdrop-blur-xl p-6 rounded-3xl border border-white/30 shadow-2xl">
-                                <img src="/256x256.png" alt="SDC Sul Logo" className="h-28 w-28 object-contain" />
+                            <div className="relative bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/30 shadow-2xl">
+                                <img src="/256x256.png" alt="SDC Sul Logo" className="h-40 w-40 object-contain" />
                             </div>
                         </div>
                     </div>
