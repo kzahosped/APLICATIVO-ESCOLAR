@@ -5,93 +5,126 @@ const LandingPage: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+        <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 relative overflow-hidden">
+            {/* Animated Background Elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="floating-shape absolute top-20 left-10 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"></div>
+                <div className="floating-shape-delay absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+                <div className="floating-shape absolute top-1/2 left-1/2 w-72 h-72 bg-pink-500/10 rounded-full blur-3xl"></div>
+            </div>
+
             {/* Header/Navbar */}
-            <header className="bg-white shadow-sm sticky top-0 z-50">
-                <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <header className="relative z-10 backdrop-blur-lg bg-white/10 border-b border-white/20 sticky top-0">
+                <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <img src="/256x256.png" alt="SDC Sul" className="h-12 w-12 object-contain" />
-                        <h1 className="font-bold text-xl text-gray-900">SDC Sul</h1>
+                        <div className="bg-white/20 backdrop-blur-md p-2 rounded-xl border border-white/30">
+                            <img src="/256x256.png" alt="SDC Sul" className="h-10 w-10 object-contain" />
+                        </div>
+                        <div>
+                            <h1 className="font-bold text-xl text-white">SDC Sul</h1>
+                            <p className="text-xs text-blue-200">Seminário Teológico</p>
+                        </div>
                     </div>
                     <button
                         onClick={() => navigate('/login')}
-                        className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2.5 rounded-full hover:shadow-lg hover:shadow-purple-500/50 transition-all transform hover:scale-105 font-medium flex items-center gap-2"
                     >
+                        <span className="material-symbols-outlined text-lg">login</span>
                         Área do Aluno
                     </button>
                 </div>
             </header>
 
             {/* Hero Section */}
-            <section className="max-w-6xl mx-auto px-4 py-20 text-center">
-                <div className="mb-8 flex justify-center">
-                    <img src="/256x256.png" alt="SDC Sul Logo" className="h-24 w-24 object-contain" />
-                </div>
-                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                    Seminário Teológico SDC Sul
-                </h1>
-                <p className="text-lg md:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-                    Formando servos para o Reino através do ensino teológico de excelência
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center mt-2">
-                    <a
-                        href="https://www.seminariosdcsul.com.br/matricula"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary/90 transition-all transform hover:scale-105 text-lg font-medium shadow-md"
-                    >
-                        Faça sua Matrícula
-                    </a>
-                    <button
-                        onClick={() => navigate('/login')}
-                        className="bg-white text-primary border-2 border-primary px-8 py-3 rounded-lg hover:bg-primary hover:text-white transition-all transform hover:scale-105 text-lg font-medium shadow-md"
-                    >
-                        Acesse sua Conta
-                    </button>
+            <section className="relative z-10 max-w-7xl mx-auto px-4 py-20 md:py-32">
+                <div className="text-center">
+                    {/* Logo with Glow Effect */}
+                    <div className="mb-8 flex justify-center">
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full blur-2xl opacity-50 animate-pulse"></div>
+                            <div className="relative bg-white/10 backdrop-blur-xl p-6 rounded-3xl border border-white/30 shadow-2xl">
+                                <img src="/256x256.png" alt="SDC Sul Logo" className="h-28 w-28 object-contain" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Title with Gradient Text */}
+                    <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 mb-6 leading-tight">
+                        Seminário Teológico
+                        <br />
+                        <span className="text-white">SDC Sul</span>
+                    </h1>
+
+                    <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+                        Formando <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-orange-200">servos para o Reino</span> através do ensino teológico de excelência
+                    </p>
+
+                    {/* CTA Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a
+                            href="https://www.seminariosdcsul.com.br/matricula"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group relative px-8 py-4 rounded-full text-lg font-bold overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-pink-600 transition-transform group-hover:scale-110"></div>
+                            <div className="relative flex items-center justify-center gap-2 text-white">
+                                <span className="material-symbols-outlined">school</span>
+                                Faça sua Matrícula
+                            </div>
+                        </a>
+
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="group relative px-8 py-4 rounded-full text-lg font-bold overflow-hidden backdrop-blur-lg bg-white/10 border-2 border-white/30 hover:bg-white/20 transition-all"
+                        >
+                            <div className="flex items-center justify-center gap-2 text-white">
+                                <span className="material-symbols-outlined">account_circle</span>
+                                Acesse sua Conta
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </section>
 
-            {/* Features */}
-            <section className="max-w-6xl mx-auto px-4 py-20">
-                <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Por que escolher a SDC Sul?</h2>
+            {/* Features Section */}
+            <section className="relative z-10 max-w-7xl mx-auto px-4 py-20">
+                <div className="text-center mb-16">
+                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Por que escolher a SDC Sul?</h2>
+                    <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-600 mx-auto rounded-full"></div>
+                </div>
+
                 <div className="grid md:grid-cols-3 gap-8">
-                    <div className="bg-white p-8 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
-                        <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <span className="material-symbols-outlined text-primary text-4xl">book</span>
+                    {[
+                        { icon: 'menu_book', title: 'Curso Completo', desc: '3 anos de formação teológica com grade curricular completa e atualizada', gradient: 'from-blue-500 to-cyan-500' },
+                        { icon: 'groups', title: 'Professores Qualificados', desc: 'Equipe de mestres dedicados ao ensino profundo da Palavra de Deus', gradient: 'from-purple-500 to-pink-500' },
+                        { icon: 'workspace_premium', title: 'Certificação', desc: 'Certificação reconhecida e valorizada ao concluir o curso', gradient: 'from-orange-500 to-red-500' }
+                    ].map((feature, index) => (
+                        <div key={index} className="group relative">
+                            <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl blur-xl ${feature.gradient}"></div>
+                            <div className="relative backdrop-blur-lg bg-white/10 border border-white/20 p-8 rounded-2xl hover:border-white/40 transition-all transform hover:scale-105">
+                                <div className={`bg-gradient-to-r ${feature.gradient} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-lg`}>
+                                    <span className="material-symbols-outlined text-white text-3xl">{feature.icon}</span>
+                                </div>
+                                <h3 className="font-bold text-2xl mb-3 text-white">{feature.title}</h3>
+                                <p className="text-blue-100 leading-relaxed">
+                                    {feature.desc}
+                                </p>
+                            </div>
                         </div>
-                        <h3 className="font-bold text-xl mb-3">Curso Completo</h3>
-                        <p className="text-gray-600 leading-relaxed">
-                            3 anos de formação teológica com grade curricular completa e atualizada
-                        </p>
-                    </div>
-
-                    <div className="bg-white p-8 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
-                        <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <span className="material-symbols-outlined text-primary text-4xl">groups</span>
-                        </div>
-                        <h3 className="font-bold text-xl mb-3">Professores Qualificados</h3>
-                        <p className="text-gray-600 leading-relaxed">
-                            Equipe de mestres dedicados ao ensino profundo da Palavra de Deus
-                        </p>
-                    </div>
-
-                    <div className="bg-white p-8 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
-                        <div className="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <span className="material-symbols-outlined text-primary text-4xl">verified</span>
-                        </div>
-                        <h3 className="font-bold text-xl mb-3">Certificação</h3>
-                        <p className="text-gray-600 leading-relaxed">
-                            Certificação reconhecida e valorizada ao concluir o curso
-                        </p>
-                    </div>
+                    ))}
                 </div>
             </section>
 
             {/* Quick Links */}
-            <section className="bg-gray-50 py-20">
-                <div className="max-w-6xl mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-12">Links Rápidos</h2>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <section className="relative z-10 py-20">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Explore Mais</h2>
+                        <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-600 mx-auto rounded-full"></div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[
                             { label: 'Quem Somos', url: 'https://www.seminariosdcsul.com.br/quem-somos', icon: 'info' },
                             { label: 'Grade Curricular', url: 'https://www.seminariosdcsul.com.br/grade-curricular', icon: 'calendar_month' },
@@ -107,10 +140,12 @@ const LandingPage: React.FC = () => {
                                 href={link.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-lg hover:border-primary transition-all flex items-center gap-3 group"
+                                className="group backdrop-blur-lg bg-white/10 border border-white/20 p-4 rounded-xl hover:bg-white/20 hover:border-white/40 transition-all flex flex-col items-center gap-3 text-center transform hover:scale-105"
                             >
-                                <span className="material-symbols-outlined text-primary text-2xl group-hover:scale-110 transition-transform">{link.icon}</span>
-                                <span className="font-medium text-gray-800 group-hover:text-primary transition-colors">{link.label}</span>
+                                <div className="bg-gradient-to-br from-blue-400 to-purple-600 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
+                                    <span className="material-symbols-outlined text-white text-2xl">{link.icon}</span>
+                                </div>
+                                <span className="font-medium text-white text-sm">{link.label}</span>
                             </a>
                         ))}
                     </div>
@@ -118,34 +153,42 @@ const LandingPage: React.FC = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="bg-primary text-white py-20">
-                <div className="max-w-4xl mx-auto px-4 text-center">
-                    <h2 className="text-4xl font-bold mb-6">Matrículas Abertas!</h2>
-                    <p className="text-xl mb-10 opacity-95 leading-relaxed">
-                        Não perca a oportunidade de fazer parte da nossa comunidade de aprendizado e crescimento espiritual
-                    </p>
-                    <a
-                        href="https://www.seminariosdcsul.com.br/whatsapp_link.php"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-white text-primary px-8 py-3 rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 text-lg font-medium shadow-lg"
-                    >
-                        <span className="material-symbols-outlined">chat</span>
-                        Fale Conosco no WhatsApp
-                    </a>
+            <section className="relative z-10 py-20">
+                <div className="max-w-4xl mx-auto px-4">
+                    <div className="relative backdrop-blur-xl bg-gradient-to-r from-orange-500/20 to-pink-600/20 border border-white/30 rounded-3xl p-12 text-center overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-pink-600 opacity-10"></div>
+                        <div className="relative z-10">
+                            <div className="bg-gradient-to-r from-orange-500 to-pink-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                                <span className="material-symbols-outlined text-white text-4xl">celebration</span>
+                            </div>
+                            <h2 className="text-4xl md:text-5xl font-black text-white mb-6">Matrículas Abertas!</h2>
+                            <p className="text-xl text-blue-100 mb-10 leading-relaxed max-w-2xl mx-auto">
+                                Não perca a oportunidade de fazer parte da nossa comunidade de aprendizado e crescimento espiritual
+                            </p>
+                            <a
+                                href="https://www.seminariosdcsul.com.br/whatsapp_link.php"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-full hover:shadow-2xl hover:shadow-green-500/50 transition-all transform hover:scale-105 text-lg font-bold"
+                            >
+                                <span className="material-symbols-outlined text-2xl">chat</span>
+                                Fale Conosco no WhatsApp
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer className="bg-gray-900 text-gray-300 py-8">
-                <div className="max-w-6xl mx-auto px-4 text-center">
-                    <p className="mb-2">© 2024 Seminário Teológico SDC Sul - Todos os direitos reservados</p>
+            <footer className="relative z-10 backdrop-blur-lg bg-black/30 border-t border-white/10 py-8 mt-20">
+                <div className="max-w-7xl mx-auto px-4 text-center">
+                    <p className="text-blue-100 mb-2">© 2024 Seminário Teológico SDC Sul - Todos os direitos reservados</p>
                     <p className="text-sm">
                         <a
                             href="https://www.seminariosdcsul.com.br"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary hover:underline"
+                            className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 hover:from-blue-300 hover:to-purple-300 transition-all font-medium"
                         >
                             www.seminariosdcsul.com.br
                         </a>
