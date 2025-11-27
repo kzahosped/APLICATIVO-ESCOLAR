@@ -1,62 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useApp } from '../contexts/AppContext';
 import BottomNav from '../components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const AdminDashboard: React.FC = () => {
-  const { currentUser, logout, financials, users, events } = useApp();
+  const { currentUser, logout, financials, users } = useApp();
   const navigate = useNavigate();
-  const [showOverdueList, setShowOverdueList] = useState(false);
 
   const totalStudents = users.filter(u => u.role === 'STUDENT').length;
-
-  // Receita do mês atual
-  const currentDate = new Date();
-  const currentMonth = currentDate.getMonth();
-  const currentYear = currentDate.getFullYear();
-  const currentMonthRevenue = financials.reduce((acc, curr) => {
-    if (curr.status === 'Pago') {
-      const paidDate = new Date(curr.paidAt || curr.dueDate);
-      if (paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear) {
-        return acc + curr.amount;
-      }
-    }
-    return acc;
-  }, 0);
-
-  // Alunos inadimplentes
-  const overdueStudents = financials
-    .filter(f => f.status === 'Vencido')
-    .map(f => {
-      const student = users.find(u => u.id === f.studentId);
-      return {
-        studentName: student?.name || 'Desconhecido',
-        description: f.description,
-        amount: f.amount,
-        dueDate: f.dueDate
-      };
-    })
-    .reduce((acc, curr) => {
-      const existing = acc.find(item => item.studentName === curr.studentName);
-      if (existing) {
-        existing.totalDebt += curr.amount;
-        existing.records.push(curr);
-      } else {
-        acc.push({
-          studentName: curr.studentName,
-          totalDebt: curr.amount,
-          records: [curr]
-        });
-      }
-      return acc;
-    }, [] as Array<{ studentName: string; totalDebt: number; records: any[] }>);
-
-  const overdueCount = overdueStudents.length;
-
-  // Eventos do dia
-  const today = new Date().toISOString().split('T')[0];
-  const todayEvents = events.filter(event => event.date === today);
+  const totalRevenue = financials.reduce((acc, curr) => curr.status === 'Pago' ? acc + curr.amount : acc, 0);
 
   // Calcular dados mensais do gráfico baseado nos lançamentos
   const monthlyData = financials.reduce((acc, record) => {
@@ -64,6 +17,7 @@ const AdminDashboard: React.FC = () => {
       const date = new Date(record.dueDate);
       const month = date.getMonth(); // 0-11
       const year = date.getFullYear();
+      const currentYear = new Date().getFullYear();
 
       // Apenas dados do ano corrente
       if (year === currentYear) {
@@ -107,78 +61,16 @@ const AdminDashboard: React.FC = () => {
           </button>
         </div>
 
-        {/* Stats - Updated */}
+        {/* Stats */}
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white dark:bg-[#1a202c] p-4 rounded-xl border border-gray-200 dark:border-gray-700">
             <p className="text-gray-500 text-xs uppercase">Alunos Ativos</p>
             <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalStudents}</p>
           </div>
           <div className="bg-white dark:bg-[#1a202c] p-4 rounded-xl border border-gray-200 dark:border-gray-700">
-            <p className="text-gray-500 text-xs uppercase">Receita (Mês Atual)</p>
-            <p className="text-2xl font-bold text-green-600">R$ {currentMonthRevenue.toLocaleString()}</p>
+            <p className="text-gray-500 text-xs uppercase">Receita (Total)</p>
+            <p className="text-2xl font-bold text-green-600">R$ {totalRevenue.toLocaleString()}</p>
           </div>
-        </div>
-
-        {/* Alunos Inadimplentes Card */}
-        <div className="bg-white dark:bg-[#1a202c] p-4 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div className="flex justify-between items-center mb-3">
-            <div>
-              <p className="text-gray-500 text-xs uppercase">Alunos Inadimplentes</p>
-              <p className="text-3xl font-bold text-red-600">{overdueCount}</p>
-            </div>
-            <div className="bg-red-100 dark:bg-red-900/20 p-3 rounded-xl">
-              <span className="material-symbols-outlined text-red-600 text-2xl">warning</span>
-            </div>
-          </div>
-
-          {overdueCount > 0 && (
-            <>
-              <button
-                onClick={() => setShowOverdueList(!showOverdueList)}
-                className="w-full mt-2 text-sm text-primary font-medium flex items-center justify-center gap-1"
-              >
-                {showOverdueList ? 'Ocultar Lista' : 'Ver Lista'}
-                <span className="material-symbols-outlined text-sm">
-                  {showOverdueList ? 'expand_less' : 'expand_more'}
-                </span>
-              </button>
-
-              {showOverdueList && (
-                <div className="mt-3 space-y-2 max-h-60 overflow-y-auto">
-                  {overdueStudents.map((student, index) => (
-                    <div key={index} className="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg border border-red-200 dark:border-red-800">
-                      <p className="font-bold text-gray-900 dark:text-white">{student.studentName}</p>
-                      <p className="text-sm text-red-600 font-medium">
-                        Total em atraso: R$ {student.totalDebt.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </p>
-                      <p className="text-xs text-gray-500">{student.records.length} pendência(s)</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Eventos do Dia */}
-        <div className="bg-white dark:bg-[#1a202c] p-4 rounded-xl border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="material-symbols-outlined text-blue-600">event</span>
-            <h3 className="font-bold text-gray-900 dark:text-white">Eventos de Hoje</h3>
-          </div>
-
-          {todayEvents.length === 0 ? (
-            <p className="text-gray-500 text-sm">Nenhum evento agendado para hoje</p>
-          ) : (
-            <div className="space-y-2">
-              {todayEvents.map((event) => (
-                <div key={event.id} className="p-3 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <p className="font-medium text-gray-900 dark:text-white">{event.title}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{event.description || 'Sem descrição'}</p>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Chart */}

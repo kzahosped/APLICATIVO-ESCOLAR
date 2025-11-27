@@ -26,8 +26,6 @@ export interface User {
   phone?: string;
   birthDate?: string;
   enrollmentYear?: string;
-  // Campo para professores
-  subjects?: string[]; // Matérias que o professor leciona
 }
 
 export interface Course {
@@ -94,7 +92,6 @@ export interface Announcement {
   targetId?: string; // ID do curso, turma ou aluno (null se Global)
   authorId: string;
   readBy: string[]; // Array de UserIDs que leram
-  attachments?: { name: string; url: string; type: string }[];
 }
 
 export interface Notification {

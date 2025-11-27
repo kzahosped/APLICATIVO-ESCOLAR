@@ -7,7 +7,7 @@ import { INITIAL_CATEGORIES } from '../constants/initialData';
 
 const Financials: React.FC = () => {
   const navigate = useNavigate();
-  const { getVisibleFinancials, payRecord, currentUser, addFinancialRecord, users } = useApp();
+  const { getVisibleFinancials, payRecord, currentUser, addFinancialRecord, users, deleteFinancialRecord } = useApp();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
 
   // Admin States
@@ -16,12 +16,12 @@ const Financials: React.FC = () => {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
-  const [discount, setDiscount] = useState('');
   const [category, setCategory] = useState('Mensalidade do curso');
 
   // PIX Modal State
   const [showPixModal, setShowPixModal] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<any>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const allRecords = getVisibleFinancials();
 
@@ -63,16 +63,13 @@ const Financials: React.FC = () => {
         amount: parseFloat(amount),
         dueDate,
         status: 'Pendente',
-        category: category as any,
-        discount: discount ? parseFloat(discount) : 0,
-        createdAt: new Date().toISOString()
+        category: category as any
       });
       setShowModal(false);
       setAmount('');
       setDescription('');
       setDueDate('');
       setSelectedStudent('');
-      setDiscount('');
     }
   };
 
@@ -121,7 +118,7 @@ const Financials: React.FC = () => {
 
         {/* Year Filter */}
         <div className="bg-gray-200 p-1 rounded-lg flex gap-1">
-          {['2026', '2025'].map(year => (
+          {['2024', '2023', '2022'].map(year => (
             <button
               key={year}
               onClick={() => setSelectedYear(year)}
@@ -147,36 +144,100 @@ const Financials: React.FC = () => {
               const finalValue = record.amount - discount;
 
               return (
-                <div key={record.id} className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+                <div key={record.id} className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-md">
                   {/* Card Header */}
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="font-bold text-lg text-gray-900 capitalize">
-                      {getMonthYear(record.dueDate)}
-                    </h3>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${record.status === 'Pago' ? 'bg-green-100 text-green-700' :
-                      record.status === 'Vencido' ? 'bg-red-100 text-red-700' :
-                        'bg-orange-100 text-orange-700'
-                      }`}>
-                      {record.status}
-                    </span>
+                  <div
+                    className="flex justify-between items-start mb-4 cursor-pointer"
+                    onClick={() => setExpandedId(expandedId === record.id ? null : record.id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${record.status === 'Pago' ? 'bg-green-100 text-green-600' :
+                        record.status === 'Vencido' ? 'bg-red-100 text-red-600' :
+                          'bg-orange-100 text-orange-600'
+                        }`}>
+                        <span className="material-symbols-outlined">
+                          {record.status === 'Pago' ? 'check_circle' : 'attach_money'}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-gray-900 capitalize">
+                          {record.description || getMonthYear(record.dueDate)}
+                        </h3>
+                        <p className="text-xs text-gray-500">{record.category}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${record.status === 'Pago' ? 'bg-green-100 text-green-700' :
+                        record.status === 'Vencido' ? 'bg-red-100 text-red-700' :
+                          'bg-orange-100 text-orange-700'
+                        }`}>
+                        {record.status}
+                      </span>
+                      <span className="material-symbols-outlined text-gray-400 text-sm">
+                        {expandedId === record.id ? 'expand_less' : 'expand_more'}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Card Body */}
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Valor:</span>
+                      <span className="text-gray-600">Vencimento:</span>
+                      <span className="font-medium text-gray-900">
+                        {new Date(record.dueDate).toLocaleDateString('pt-BR')}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Valor Original:</span>
                       <span className="font-medium text-gray-900">
                         R$ {record.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Desconto:</span>
-                      <span className="font-medium text-gray-900">
-                        - R$ {discount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                      <span className="font-bold text-gray-700">Valor Final:</span>
+
+                    {/* Expandable Details */}
+                    {expandedId === record.id && (
+                      <div className="pt-2 mt-2 border-t border-gray-100 space-y-2 animate-fade-in">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Desconto:</span>
+                          <span className="text-green-600 font-medium">
+                            - R$ {discount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        {record.paidAt && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Pago em:</span>
+                            <span className="text-gray-900">
+                              {new Date(record.paidAt).toLocaleDateString('pt-BR')}
+                            </span>
+                          </div>
+                        )}
+                        <div className="bg-gray-50 p-3 rounded-lg mt-2">
+                          <p className="text-xs text-gray-500 uppercase font-bold mb-1">Detalhes</p>
+                          <p className="text-sm text-gray-700">{record.description || 'Mensalidade escolar referente ao período.'}</p>
+                        </div>
+
+                        {/* Admin Actions */}
+                        {currentUser?.role === UserRole.ADMIN && (
+                          <div className="pt-2 flex justify-end">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (confirm('Tem certeza que deseja excluir este lançamento?')) {
+                                  deleteFinancialRecord(record.id);
+                                }
+                              }}
+                              className="text-red-500 hover:text-red-700 text-sm font-bold flex items-center gap-1 px-3 py-2 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <span className="material-symbols-outlined text-lg">delete</span>
+                              Excluir Lançamento
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex justify-between items-center pt-3 border-t border-gray-100 mt-2">
+                      <span className="font-bold text-gray-700">Total a Pagar:</span>
                       <span className={`text-xl font-bold ${record.status === 'Pago' ? 'text-green-600' :
                         record.status === 'Vencido' ? 'text-red-600' :
                           'text-orange-500'
@@ -186,54 +247,28 @@ const Financials: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Dates Section */}
-                  <div className="space-y-1 mb-3 text-xs text-gray-500">
-                    {record.createdAt && (
-                      <div className="flex justify-between">
-                        <span>📅 Lançamento:</span>
-                        <span className="font-medium">{new Date(record.createdAt).toLocaleDateString('pt-BR')}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span>⏰ Vencimento:</span>
-                      <span className="font-medium">{new Date(record.dueDate).toLocaleDateString('pt-BR')}</span>
+                  {/* Card Footer Actions (Student Only) */}
+                  {currentUser?.role === UserRole.STUDENT && (
+                    <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end gap-2">
+                      {record.status === 'Pago' ? (
+                        <button className="flex-1 bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
+                          <span className="material-symbols-outlined">receipt</span>
+                          Comprovante
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setSelectedPayment(record);
+                            setShowPixModal(true);
+                          }}
+                          className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
+                        >
+                          <span className="material-symbols-outlined">qr_code_2</span>
+                          Pagar com PIX
+                        </button>
+                      )}
                     </div>
-                    {record.paidAt && (
-                      <div className="flex justify-between">
-                        <span>✅ Pagamento:</span>
-                        <span className="font-medium text-green-600">{new Date(record.paidAt).toLocaleDateString('pt-BR')}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card Footer */}
-                  <div className="flex justify-between items-center">
-
-                    {currentUser?.role === UserRole.STUDENT && (
-                      <>
-                        {record.status === 'Pago' ? (
-                          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors">
-                            Ver Comprovante
-                          </button>
-                        ) : record.status === 'Vencido' ? (
-                          <button className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-700 transition-colors">
-                            Ver Detalhes
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setSelectedPayment(record);
-                              setShowPixModal(true);
-                            }}
-                            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-green-700 transition-colors flex items-center gap-2"
-                          >
-                            <span className="material-symbols-outlined text-lg">qr_code_2</span>
-                            Pagar Agora
-                          </button>
-                        )}
-                      </>
-                    )}
-                  </div>
+                  )}
                 </div>
               );
             })

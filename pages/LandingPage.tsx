@@ -17,8 +17,8 @@ const LandingPage: React.FC = () => {
             <header className="relative z-10 backdrop-blur-lg bg-white/10 border-b border-white/20 sticky top-0">
                 <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="bg-white/20 backdrop-blur-md p-2 rounded-xl border border-white/30">
-                            <img src="/256x256.png" alt="SDC Sul" className="h-10 w-10 object-contain" />
+                        <div className="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/20">
+                            <img src="/logo-white.png" alt="SDC Sul" className="h-10 w-auto object-contain" />
                         </div>
                         <div>
                             <h1 className="font-bold text-xl text-white">SDC Sul</h1>
@@ -42,8 +42,8 @@ const LandingPage: React.FC = () => {
                     <div className="mb-8 flex justify-center">
                         <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full blur-2xl opacity-50 animate-pulse"></div>
-                            <div className="relative bg-white/10 backdrop-blur-xl p-8 rounded-3xl border border-white/30 shadow-2xl">
-                                <img src="/256x256.png" alt="SDC Sul Logo" className="h-40 w-40 object-contain" />
+                            <div className="relative bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/20 shadow-2xl">
+                                <img src="/logo-white.png" alt="SDC Sul Logo" className="h-28 w-auto object-contain" />
                             </div>
                         </div>
                     </div>
@@ -87,45 +87,7 @@ const LandingPage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Quick Links - MOVED UP */}
-            <section className="relative z-10 py-20">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Explore Mais</h2>
-                        <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-600 mx-auto rounded-full"></div>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {[
-                            { label: 'Quem Somos', url: 'https://www.seminariosdcsul.com.br/quem-somos', icon: 'info' },
-                            { label: 'Grade Curricular', url: 'https://www.seminariosdcsul.com.br/grade-curricular', icon: 'calendar_month' },
-                            { label: 'Professores', url: 'https://www.seminariosdcsul.com.br/professores', icon: 'person' },
-                            { label: 'Horários', url: 'https://www.seminariosdcsul.com.br/horarios', icon: 'schedule' },
-                            { label: 'Provas e Simulados', url: 'https://www.seminariosdcsul.com.br/provas-simulados', icon: 'quiz' },
-                            { label: 'Material Teológico', url: 'https://www.seminariosdcsul.com.br/material-teologico', icon: 'book' },
-                            { label: 'Fotos', url: 'https://www.seminariosdcsul.com.br/fotos', icon: 'photo_library' },
-                            { label: 'Vídeos', url: 'https://www.seminariosdcsul.com.br/videos', icon: 'play_circle' },
-                            { label: 'Localização', url: 'https://www.seminariosdcsul.com.br/localizacao', icon: 'location_on' },
-                            { label: 'Fale Conosco', url: 'https://www.seminariosdcsul.com.br/fale-conosco', icon: 'mail' },
-                        ].map((link, index) => (
-                            <a
-                                key={index}
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="group backdrop-blur-lg bg-white/10 border border-white/20 p-4 rounded-xl hover:bg-white/20 hover:border-white/40 transition-all flex flex-col items-center gap-3 text-center transform hover:scale-105"
-                            >
-                                <div className="bg-gradient-to-br from-blue-400 to-purple-600 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
-                                    <span className="material-symbols-outlined text-white text-2xl">{link.icon}</span>
-                                </div>
-                                <span className="font-medium text-white text-sm">{link.label}</span>
-                            </a>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Features Section - MOVED DOWN */}
+            {/* Features Section */}
             <section className="relative z-10 max-w-7xl mx-auto px-4 py-20">
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Por que escolher a SDC Sul?</h2>
@@ -151,6 +113,42 @@ const LandingPage: React.FC = () => {
                             </div>
                         </div>
                     ))}
+                </div>
+            </section>
+
+            {/* Quick Links */}
+            <section className="relative z-10 py-20">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Explore Mais</h2>
+                        <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-600 mx-auto rounded-full"></div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {[
+                            { label: 'Quem Somos', url: 'https://www.seminariosdcsul.com.br/quem-somos', icon: 'info' },
+                            { label: 'Grade Curricular', url: 'https://www.seminariosdcsul.com.br/grade-curricular', icon: 'calendar_month' },
+                            { label: 'Professores', url: 'https://www.seminariosdcsul.com.br/professores', icon: 'person' },
+                            { label: 'Horários', url: 'https://www.seminariosdcsul.com.br/horarios', icon: 'schedule' },
+                            { label: 'Fotos', url: 'https://www.seminariosdcsul.com.br/fotos', icon: 'photo_library' },
+                            { label: 'Vídeos', url: 'https://www.seminariosdcsul.com.br/videos', icon: 'play_circle' },
+                            { label: 'Localização', url: 'https://www.seminariosdcsul.com.br/localizacao', icon: 'location_on' },
+                            { label: 'Fale Conosco', url: 'https://www.seminariosdcsul.com.br/fale-conosco', icon: 'mail' },
+                        ].map((link, index) => (
+                            <a
+                                key={index}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group backdrop-blur-lg bg-white/10 border border-white/20 p-4 rounded-xl hover:bg-white/20 hover:border-white/40 transition-all flex flex-col items-center gap-3 text-center transform hover:scale-105"
+                            >
+                                <div className="bg-gradient-to-br from-blue-400 to-purple-600 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-purple-500/50 transition-shadow">
+                                    <span className="material-symbols-outlined text-white text-2xl">{link.icon}</span>
+                                </div>
+                                <span className="font-medium text-white text-sm">{link.label}</span>
+                            </a>
+                        ))}
+                    </div>
                 </div>
             </section>
 
