@@ -94,6 +94,11 @@ export interface Announcement {
   targetId?: string; // ID do curso, turma ou aluno (null se Global)
   authorId: string;
   readBy: string[]; // Array de UserIDs que leram
+  attachments?: {
+    name: string;
+    url: string;
+    type: string; // 'image' | 'pdf' | 'other'
+  }[];
 }
 
 export interface Notification {
