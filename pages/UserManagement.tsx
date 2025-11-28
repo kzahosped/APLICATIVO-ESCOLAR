@@ -14,9 +14,13 @@ const UserManagement: React.FC = () => {
         }
     };
 
-    const filteredUsers = users.filter(user => {
+    // Safety check for users array
+    const safeUsers = Array.isArray(users) ? users : [];
+
+    const filteredUsers = safeUsers.filter(user => {
+        if (!user) return false;
         if (filter === 'ALL') return true;
-        return user.role === filter;
+        return user?.role === filter;
     });
 
     return (
@@ -71,34 +75,37 @@ const UserManagement: React.FC = () => {
             </div>
 
             <div className="p-4 space-y-4">
-                {filteredUsers.map(user => (
-                    <div key={user.id} className="bg-white p-4 rounded-xl border border-gray-200 flex items-center gap-4">
-                        <img src={user.avatarUrl} alt={user.name} className="w-10 h-10 rounded-full bg-gray-200" />
-                        <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-gray-900 truncate">{user.name}</h3>
-                            <p className="text-sm text-gray-500 truncate">{user.email}</p>
-                            <div className="flex flex-wrap gap-2 mt-1">
-                                <span className="text-xs bg-gray-100 px-2 py-1 rounded inline-block">
-                                    {user.role === 'STUDENT' ? 'Aluno' :
-                                        user.role === 'PROFESSOR' ? 'Professor' :
-                                            user.role === 'ADMIN' ? 'Admin' : user.role}
-                                </span>
-                                {user.role === 'PROFESSOR' && Array.isArray(user.subjects) && user.subjects.length > 0 && (
-                                    <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded inline-block truncate max-w-[150px]">
-                                        {user.subjects.join(', ')}
+                {filteredUsers.map(user => {
+                    if (!user) return null;
+                    return (
+                        <div key={user.id || Math.random()} className="bg-white p-4 rounded-xl border border-gray-200 flex items-center gap-4">
+                            <img src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}`} alt={user.name} className="w-10 h-10 rounded-full bg-gray-200" />
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-bold text-gray-900 truncate">{user.name || 'Sem Nome'}</h3>
+                                <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    <span className="text-xs bg-gray-100 px-2 py-1 rounded inline-block">
+                                        {user.role === 'STUDENT' ? 'Aluno' :
+                                            user.role === 'PROFESSOR' ? 'Professor' :
+                                                user.role === 'ADMIN' ? 'Admin' : (user.role || 'N/A')}
                                     </span>
-                                )}
+                                    {user.role === 'PROFESSOR' && Array.isArray(user.subjects) && user.subjects.length > 0 && (
+                                        <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded inline-block truncate max-w-[150px]">
+                                            {user.subjects.join(', ')}
+                                        </span>
+                                    )}
+                                </div>
                             </div>
+                            <button
+                                onClick={() => user.id && handleDelete(user.id, user.name || '')}
+                                className="text-gray-400 hover:text-red-500 transition-colors p-2"
+                                title="Excluir usuário"
+                            >
+                                <span className="material-symbols-outlined">delete</span>
+                            </button>
                         </div>
-                        <button
-                            onClick={() => handleDelete(user.id, user.name)}
-                            className="text-gray-400 hover:text-red-500 transition-colors p-2"
-                            title="Excluir usuário"
-                        >
-                            <span className="material-symbols-outlined">delete</span>
-                        </button>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             <BottomNav />
