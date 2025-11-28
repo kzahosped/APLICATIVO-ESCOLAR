@@ -43,8 +43,8 @@ const UserManagement: React.FC = () => {
                     <button
                         onClick={() => setFilter('ALL')}
                         className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'ALL'
-                                ? 'bg-primary text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-primary text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                     >
                         Todos
@@ -52,8 +52,8 @@ const UserManagement: React.FC = () => {
                     <button
                         onClick={() => setFilter('STUDENT')}
                         className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'STUDENT'
-                                ? 'bg-primary text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-primary text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                     >
                         Alunos
@@ -61,8 +61,8 @@ const UserManagement: React.FC = () => {
                     <button
                         onClick={() => setFilter('PROFESSOR')}
                         className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filter === 'PROFESSOR'
-                                ? 'bg-primary text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            ? 'bg-primary text-white'
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                     >
                         Professores
@@ -83,7 +83,7 @@ const UserManagement: React.FC = () => {
                                         user.role === 'PROFESSOR' ? 'Professor' :
                                             user.role === 'ADMIN' ? 'Admin' : user.role}
                                 </span>
-                                {user.role === 'PROFESSOR' && user.subjects && user.subjects.length > 0 && (
+                                {user.role === 'PROFESSOR' && Array.isArray(user.subjects) && user.subjects.length > 0 && (
                                     <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded inline-block truncate max-w-[150px]">
                                         {user.subjects.join(', ')}
                                     </span>
