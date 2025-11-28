@@ -136,9 +136,9 @@ const Announcements: React.FC = () => {
 
       {/* Modal de Criação - Redesigned */}
       {showModal && (
-        <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-white z-50 flex flex-col">
           {/* Header */}
-          <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
+          <div className="flex-none bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
             <button onClick={() => { setShowModal(false); setTitle(''); setContent(''); setAttachedFiles([]); }} className="text-gray-600">
               <span className="material-symbols-outlined">arrow_back</span>
             </button>
@@ -219,8 +219,8 @@ const Announcements: React.FC = () => {
             </div>
           </div>
 
-          {/* Sticky Send Button */}
-          <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+          {/* Fixed Send Button Footer */}
+          <div className="flex-none bg-white border-t border-gray-200 p-4 z-10">
             <button
               onClick={handlePublish}
               disabled={!title || !content}
