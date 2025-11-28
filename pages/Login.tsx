@@ -53,7 +53,7 @@ const Login: React.FC = () => {
       if (err.code === 'auth/user-not-found') {
         setResetMessage('Email não encontrado.');
       } else {
-        setResetMessage('Erro ao enviar email. Tente novamente.');
+        setResetMessage(`Erro: ${err.code} - ${err.message}`);
       }
     }
   };
