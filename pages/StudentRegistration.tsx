@@ -73,25 +73,29 @@ const StudentRegistration: React.FC = () => {
       return;
     }
 
-    await addUser({
-      id: Date.now().toString(),
-      name,
-      email,
-      password,
-      role: UserRole.STUDENT,
-      registrationId: Date.now().toString().slice(-6),
-      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
-      courseId: course,
-      classId: classId,
-      // Campos adicionais
-      birthDate,
-      cpf,
-      rg,
-      phone,
-      enrollmentYear
-    } as any);
-    alert('Aluno cadastrado com sucesso!');
-    navigate('/admin/users');
+    try {
+      await addUser({
+        id: Date.now().toString(),
+        name,
+        email,
+        password,
+        role: UserRole.STUDENT,
+        registrationId: Date.now().toString().slice(-6),
+        avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+        courseId: course,
+        classId: classId,
+        // Campos adicionais
+        birthDate,
+        cpf,
+        rg,
+        phone,
+        enrollmentYear
+      } as any);
+      alert('Aluno cadastrado com sucesso!');
+      navigate('/admin/users');
+    } catch (error: any) {
+      alert(error.message || 'Erro ao cadastrar aluno.');
+    }
   };
 
   return (

@@ -95,9 +95,13 @@ const ProfessorRegistration: React.FC = () => {
             registrationId: `PROF-${Date.now()}`
         };
 
-        await addUser(newProfessor);
-        alert('Professor cadastrado com sucesso!');
-        navigate('/admin/users');
+        try {
+            await addUser(newProfessor);
+            alert('Professor cadastrado com sucesso!');
+            navigate('/admin/users');
+        } catch (error: any) {
+            alert(error.message || 'Erro ao cadastrar professor.');
+        }
     };
 
     return (

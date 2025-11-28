@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User, UserRole, Grade, FinancialRecord, Announcement, InstitutionSettings, Notification, Ticket, CalendarEvent } from '../types';
 import * as firestoreService from '../services/firestoreService';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../services/firebase';
 
 const INITIAL_SETTINGS: InstitutionSettings = {
   name: 'Seminário Teológico Servos de Cristo',
@@ -362,8 +364,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // --- USER MGMT ---
   const addUser = async (user: User) => {
-    await firestoreService.createUser(user);
-    setUsers(prev => [...prev, user]);
+    try {
+      // Create user in Firebase Authentication first
+      await createUserWithEmailAndPassword(auth, user.email, user.password);
+
+      // Then save to Firestore
+      await firestoreService.createUser(user);
+      setUsers(prev => [...prev, user]);
+    } catch (error: any) {
+      console.error('Error creating user:', error);
+      // If auth creation fails, still throw to show error to admin
+      if (error.code === 'auth/email-already-in-use') {
+        throw new Error('Este e-mail já está cadastrado.');
+      }
+      throw new Error('Erro ao criar usuário. Tente novamente.');
+    }
   };
 
   const removeUser = async (userId: string) => {
