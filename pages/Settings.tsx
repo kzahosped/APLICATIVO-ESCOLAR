@@ -62,6 +62,15 @@ const Settings: React.FC = () => {
       const downloadURL = await getDownloadURL(snapshot.ref);
 
       setUserAvatar(downloadURL);
+
+      // Auto-save the new avatar
+      if (currentUser) {
+        updateUser({
+          ...currentUser,
+          avatarUrl: downloadURL
+        });
+      }
+
       setUploading(false);
     } catch (error) {
       console.error('Error uploading image:', error);
@@ -84,6 +93,7 @@ const Settings: React.FC = () => {
       updateUser({
         ...currentUser,
         bio: userBio,
+        // avatarUrl is already saved on upload, but we include it here too just in case
         avatarUrl: userAvatar
       });
       alert('Perfil atualizado com sucesso!');
@@ -118,11 +128,14 @@ const Settings: React.FC = () => {
                 <img
                   src={userAvatar || 'https://via.placeholder.com/150'}
                   alt="Avatar"
-                  className="h-24 w-24 rounded-full object-cover border-4 border-primary shadow-lg"
+                  className="h-24 w-24 rounded-full object-cover border-4 border-primary shadow-lg bg-gray-100"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://via.placeholder.com/150?text=Error';
+                  }}
                 />
                 {uploading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
-                    <span className="text-white text-xs">Carregando...</span>
+                    <span className="text-white text-xs">...</span>
                   </div>
                 )}
               </div>
@@ -138,19 +151,6 @@ const Settings: React.FC = () => {
                   disabled={uploading}
                 />
               </label>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Ou cole uma URL abaixo (máx 2MB)</p>
-            </div>
-
-            {/* Avatar URL Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL do Avatar</label>
-              <input
-                type="text"
-                value={userAvatar}
-                onChange={(e) => setUserAvatar(e.target.value)}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-800 dark:text-white text-sm"
-                placeholder="https://..."
-              />
             </div>
 
             {/* Bio */}
