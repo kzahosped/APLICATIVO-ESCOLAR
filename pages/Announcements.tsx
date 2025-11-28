@@ -136,7 +136,7 @@ const Announcements: React.FC = () => {
 
       {/* Modal de Criação - Redesigned */}
       {showModal && (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col h-[100dvh]">
+        <div className="fixed inset-0 bg-white z-[100] flex flex-col h-[100dvh]">
           {/* Header */}
           <div className="flex-none bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
             <button onClick={() => { setShowModal(false); setTitle(''); setContent(''); setAttachedFiles([]); }} className="text-gray-600">
