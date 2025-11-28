@@ -26,6 +26,8 @@ export interface User {
   phone?: string;
   birthDate?: string;
   enrollmentYear?: string;
+  // Campos para professor
+  subjects?: string[]; // Matérias que o professor leciona
 }
 
 export interface Course {

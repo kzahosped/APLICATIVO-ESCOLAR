@@ -16,6 +16,7 @@ import UserManagement from './pages/UserManagement';
 import Settings from './pages/Settings';
 import Debug from './pages/Debug';
 import StudentRegistration from './pages/StudentRegistration';
+import ProfessorRegistration from './pages/ProfessorRegistration';
 import GradeEntry from './pages/GradeEntry';
 import Notifications from './pages/Notifications';
 import Agenda from './pages/Agenda';
@@ -49,6 +50,7 @@ const MainRouter = () => {
       <Route path="/admin" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><UserManagement /></ProtectedRoute>} />
       <Route path="/admin/register" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><StudentRegistration /></ProtectedRoute>} />
+      <Route path="/admin/register-professor" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ProfessorRegistration /></ProtectedRoute>} />
       <Route path="/admin/financial" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><Financials /></ProtectedRoute>} />
       <Route path="/admin/support" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><Support /></ProtectedRoute>} />
 

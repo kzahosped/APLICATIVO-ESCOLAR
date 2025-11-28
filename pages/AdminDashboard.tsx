@@ -89,12 +89,16 @@ const AdminDashboard: React.FC = () => {
 
       <div className="p-4 space-y-4">
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <button onClick={() => navigate('/admin/register')} className="p-4 bg-primary text-white rounded-xl shadow-lg flex flex-col items-center justify-center gap-2 hover:bg-primary/90">
             <span className="material-symbols-outlined text-3xl">person_add</span>
             <span className="font-medium text-sm">Novo Aluno</span>
           </button>
-          <button onClick={() => navigate('/announcements')} className="p-4 bg-white dark:bg-[#1a202c] text-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex flex-col items-center justify-center gap-2">
+          <button onClick={() => navigate('/admin/register-professor')} className="p-4 bg-white dark:bg-[#1a202c] text-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex flex-col items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-[#1f2937]">
+            <span className="material-symbols-outlined text-3xl text-blue-500">school</span>
+            <span className="font-medium text-sm text-center">Novo Professor</span>
+          </button>
+          <button onClick={() => navigate('/announcements')} className="p-4 bg-white dark:bg-[#1a202c] text-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex flex-col items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-[#1f2937]">
             <span className="material-symbols-outlined text-3xl text-purple-500">campaign</span>
             <span className="font-medium text-sm">Comunicado</span>
           </button>

@@ -19,6 +19,11 @@ const StudentRegistration: React.FC = () => {
   const [classId, setClassId] = useState('');
   const [enrollmentYear, setEnrollmentYear] = useState('');
 
+  // Dados de Acesso
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
   // Máscara para CPF: 000.000.000-00
   const maskCPF = (value: string) => {
     return value
@@ -58,29 +63,35 @@ const StudentRegistration: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (name && cpf && rg && course && classId && enrollmentYear) {
-      // Remove máscara do CPF para usar como login/senha
-      const cpfClean = cpf.replace(/\D/g, '');
-
-      await addUser({
-        id: Date.now().toString(),
-        name,
-        email: cpfClean, // CPF sem máscara como login
-        password: cpfClean, // CPF sem máscara como senha
-        role: UserRole.STUDENT,
-        registrationId: Date.now().toString().slice(-6),
-        avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
-        courseId: course,
-        classId: classId,
-        // Campos adicionais
-        birthDate,
-        cpf,
-        rg,
-        phone,
-        enrollmentYear
-      } as any);
-      navigate('/admin/users');
+    if (!name || !cpf || !rg || !course || !classId || !enrollmentYear || !email || !password) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
     }
+
+    if (password !== confirmPassword) {
+      alert('As senhas não coincidem.');
+      return;
+    }
+
+    await addUser({
+      id: Date.now().toString(),
+      name,
+      email,
+      password,
+      role: UserRole.STUDENT,
+      registrationId: Date.now().toString().slice(-6),
+      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+      courseId: course,
+      classId: classId,
+      // Campos adicionais
+      birthDate,
+      cpf,
+      rg,
+      phone,
+      enrollmentYear
+    } as any);
+    alert('Aluno cadastrado com sucesso!');
+    navigate('/admin/users');
   };
 
   return (
@@ -154,6 +165,44 @@ const StudentRegistration: React.FC = () => {
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="(00) 00000-0000"
               maxLength={15}
+            />
+          </div>
+        </div>
+
+        {/* Dados de Acesso */}
+        <div className="bg-white rounded-lg p-4 space-y-4">
+          <h2 className="font-bold text-gray-900 text-sm">Dados de Acesso</h2>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">Email *</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="email@exemplo.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">Senha *</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Digite a senha"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm mb-2">Confirmar Senha *</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Digite a senha novamente"
             />
           </div>
         </div>
