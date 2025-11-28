@@ -136,7 +136,7 @@ const Announcements: React.FC = () => {
 
       {/* Modal de Criação - Redesigned */}
       {showModal && (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col">
+        <div className="fixed inset-0 bg-white z-50 flex flex-col h-[100dvh]">
           {/* Header */}
           <div className="flex-none bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
             <button onClick={() => { setShowModal(false); setTitle(''); setContent(''); setAttachedFiles([]); }} className="text-gray-600">
@@ -152,7 +152,7 @@ const Announcements: React.FC = () => {
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-6">
             {/* Título */}
             <div>
               <label className="block text-gray-900 font-medium mb-2">Título</label>
