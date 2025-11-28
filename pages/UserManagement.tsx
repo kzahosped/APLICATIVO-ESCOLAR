@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
 import BottomNav from '../components/BottomNav';
@@ -82,7 +82,7 @@ const UserManagement: React.FC = () => {
                             <img src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}`} alt={user.name} className="w-10 h-10 rounded-full bg-gray-200" />
                             <div className="flex-1 min-w-0">
                                 <h3 className="font-bold text-gray-900 truncate">{user.name || 'Sem Nome'}</h3>
-                                <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                                <p className="text-sm text-gray-500 truncate">{user.email || 'Sem Email'}</p>
                                 <div className="flex flex-wrap gap-2 mt-1">
                                     <span className="text-xs bg-gray-100 px-2 py-1 rounded inline-block">
                                         {user.role === 'STUDENT' ? 'Aluno' :
@@ -109,7 +109,7 @@ const UserManagement: React.FC = () => {
             </div>
 
             <BottomNav />
-        </div>
+        </div >
     );
 };
 
