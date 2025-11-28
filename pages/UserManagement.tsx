@@ -5,7 +5,13 @@ import BottomNav from '../components/BottomNav';
 
 const UserManagement: React.FC = () => {
     const navigate = useNavigate();
-    const { users } = useApp();
+    const { users, removeUser } = useApp();
+
+    const handleDelete = (userId: string, userName: string) => {
+        if (confirm(`Tem certeza que deseja excluir o usuário "${userName}"?`)) {
+            removeUser(userId);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
@@ -34,6 +40,13 @@ const UserManagement: React.FC = () => {
                             <p className="text-sm text-gray-500">{user.email}</p>
                             <span className="text-xs bg-gray-100 px-2 py-1 rounded mt-1 inline-block">{user.role}</span>
                         </div>
+                        <button
+                            onClick={() => handleDelete(user.id, user.name)}
+                            className="text-gray-400 hover:text-red-500 transition-colors p-2"
+                            title="Excluir usuário"
+                        >
+                            <span className="material-symbols-outlined">delete</span>
+                        </button>
                     </div>
                 ))}
             </div>
