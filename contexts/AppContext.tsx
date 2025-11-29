@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { User, UserRole, Grade, FinancialRecord, Announcement, InstitutionSettings, Notification, Ticket, CalendarEvent, Payment } from '../types';
+import { User, UserRole, Grade, FinancialRecord, Announcement, InstitutionSettings, Notification, Ticket, CalendarEvent, Payment, AttendanceRecord } from '../types';
 import * as firestoreService from '../services/firestoreService';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -54,6 +54,10 @@ interface AppContextType {
   getVisibleFinancials: () => FinancialRecord[];
   getVisibleTickets: () => Ticket[];
   getStudentNotifications: () => Notification[];
+
+  // Attendance
+  saveAttendance: (record: AttendanceRecord) => Promise<boolean>;
+  getAttendance: (date: string, subject: string, classId?: string) => Promise<AttendanceRecord | null>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -466,7 +470,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       updateGrade,
       addUser, removeUser, updateUser, updateSettings,
       markNotificationAsRead,
-      getVisibleAnnouncements, getVisibleFinancials, getVisibleTickets, getStudentNotifications
+      getVisibleAnnouncements, getVisibleFinancials, getVisibleTickets, getStudentNotifications,
+      saveAttendance: firestoreService.saveAttendance,
+      getAttendance: firestoreService.getAttendance
     }}>
       {children}
     </AppContext.Provider>

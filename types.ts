@@ -142,3 +142,17 @@ export interface InstitutionSettings {
   logoUrl: string;
   mission: string;
 }
+
+export type AttendanceStatus = 'Presente' | 'Ausente' | 'Justificado';
+
+export interface AttendanceRecord {
+  id: string;
+  date: string; // YYYY-MM-DD
+  subject: string;
+  professorId: string;
+  classId?: string;
+  students: {
+    studentId: string;
+    status: AttendanceStatus;
+  }[];
+}

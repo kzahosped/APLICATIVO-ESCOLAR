@@ -10,7 +10,7 @@ import {
     where,
     setDoc
 } from 'firebase/firestore';
-import { User, Announcement, FinancialRecord, Grade, Ticket, Notification, CalendarEvent, UserRole } from '../types';
+import { User, Announcement, FinancialRecord, Grade, Ticket, Notification, CalendarEvent, UserRole, AttendanceRecord } from '../types';
 import { INITIAL_USERS, INITIAL_EVENTS } from '../constants/initialData';
 
 const USERS_COLLECTION = 'users';
@@ -20,6 +20,7 @@ const GRADES_COLLECTION = 'grades';
 const TICKETS_COLLECTION = 'tickets';
 const NOTIFICATIONS_COLLECTION = 'notifications';
 const EVENTS_COLLECTION = 'events';
+const ATTENDANCE_COLLECTION = 'attendance';
 
 // ==================== USERS ====================
 export const createUser = async (user: User) => {
@@ -256,6 +257,40 @@ export const getEvents = async (): Promise<CalendarEvent[]> => {
     } catch (error) {
         console.error('Error getting events:', error);
         return [];
+    }
+};
+
+// ==================== ATTENDANCE ====================
+export const saveAttendance = async (record: AttendanceRecord) => {
+    try {
+        await setDoc(doc(db, ATTENDANCE_COLLECTION, record.id), record);
+        return true;
+    } catch (error) {
+        console.error('Error saving attendance:', error);
+        return false;
+    }
+};
+
+export const getAttendance = async (date: string, subject: string, classId?: string): Promise<AttendanceRecord | null> => {
+    try {
+        let q = query(
+            collection(db, ATTENDANCE_COLLECTION),
+            where('date', '==', date),
+            where('subject', '==', subject)
+        );
+
+        if (classId) {
+            q = query(q, where('classId', '==', classId));
+        }
+
+        const querySnapshot = await getDocs(q);
+        if (querySnapshot.empty) return null;
+
+        // Return the first match (should be unique per date/subject/class)
+        return querySnapshot.docs[0].data() as AttendanceRecord;
+    } catch (error) {
+        console.error('Error getting attendance:', error);
+        return null;
     }
 };
 

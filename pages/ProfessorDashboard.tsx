@@ -26,7 +26,7 @@ const ProfessorDashboard: React.FC = () => {
         <div className="bg-primary/5 border border-primary/20 p-4 rounded-xl">
           <h2 className="text-lg font-bold text-primary mb-2">Minhas Turmas</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Selecione uma turma para gerenciar notas e frequência.</p>
-          
+
           <div className="space-y-3">
             <div onClick={() => navigate('/professor/grades')} className="bg-white dark:bg-[#1a202c] p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-primary transition-colors">
               <div className="flex justify-between items-center">
@@ -50,6 +50,10 @@ const ProfessorDashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
+          <button onClick={() => navigate('/attendance')} className="p-4 bg-white dark:bg-[#1a202c] rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col items-center gap-2">
+            <span className="material-symbols-outlined text-2xl text-green-500">how_to_reg</span>
+            <span className="text-sm font-medium dark:text-gray-200">Chamada</span>
+          </button>
           <button onClick={() => navigate('/announcements')} className="p-4 bg-white dark:bg-[#1a202c] rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col items-center gap-2">
             <span className="material-symbols-outlined text-2xl text-orange-500">campaign</span>
             <span className="text-sm font-medium dark:text-gray-200">Comunicados</span>

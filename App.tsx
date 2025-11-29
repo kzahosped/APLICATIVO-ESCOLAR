@@ -22,6 +22,7 @@ import Notifications from './pages/Notifications';
 import Agenda from './pages/Agenda';
 import Support from './pages/Support';
 import LandingPage from './pages/LandingPage';
+import Attendance from './pages/Attendance';
 
 const ProtectedRoute = ({ children, allowedRoles }: { children?: React.ReactNode, allowedRoles: UserRole[] }) => {
   const { currentUser } = useApp();
@@ -64,6 +65,7 @@ const MainRouter = () => {
       {/* Professor Routes */}
       <Route path="/professor" element={<ProtectedRoute allowedRoles={[UserRole.PROFESSOR]}><ProfessorDashboard /></ProtectedRoute>} />
       <Route path="/professor/grades" element={<ProtectedRoute allowedRoles={[UserRole.PROFESSOR]}><GradeEntry /></ProtectedRoute>} />
+      <Route path="/attendance" element={<ProtectedRoute allowedRoles={[UserRole.PROFESSOR, UserRole.ADMIN]}><Attendance /></ProtectedRoute>} />
 
       {/* Shared Routes */}
       <Route path="/announcements" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.PROFESSOR, UserRole.STUDENT]}><Announcements /></ProtectedRoute>} />
