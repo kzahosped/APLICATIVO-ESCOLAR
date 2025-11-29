@@ -24,10 +24,9 @@ const Financials: React.FC = () => {
   const [paymentAmount, setPaymentAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'Dinheiro' | 'PIX' | 'Cartão' | 'Transferência'>('PIX');
   const [paymentNotes, setPaymentNotes] = useState('');
+  const [showPaymentInfo, setShowPaymentInfo] = useState(false);
 
-  // PIX Modal State
-  const [showPixModal, setShowPixModal] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<any>(null);
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const allRecords = getVisibleFinancials();
@@ -417,121 +416,24 @@ const Financials: React.FC = () => {
         </div>
       )}
 
-      {/* PIX Payment Modal */}
-      {showPixModal && selectedPayment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1a202c] rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-green-500 to-green-600 p-5 rounded-t-2xl">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <span className="material-symbols-outlined">qr_code_2</span>
-                  Pagamento PIX
-                </h2>
-                <button
-                  onClick={() => setShowPixModal(false)}
-                  className="text-white hover:bg-white/20 rounded-full p-2 transition-colors"
-                >
-                  <span className="material-symbols-outlined">close</span>
-                </button>
-              </div>
-            </div>
 
-            {/* Content */}
-            <div className="p-6 space-y-6">
-              {/* Payment Info */}
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Descrição:</span>
-                  <span className="font-bold text-gray-900 dark:text-white">{selectedPayment.description}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Vencimento:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    {new Date(selectedPayment.dueDate).toLocaleDateString('pt-BR')}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <span className="font-bold text-gray-700 dark:text-gray-300">Valor a Pagar:</span>
-                  <span className="text-2xl font-bold text-green-600">
-                    R$ {((selectedPayment.amount || 0) - (selectedPayment.discount || 0)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-              </div>
 
-              {/* QR Code */}
-              <div className="flex flex-col items-center space-y-4">
-                <div className="bg-white p-4 rounded-xl border-4 border-green-500 shadow-lg">
-                  <img
-                    src="/pix-qrcode.png"
-                    alt="QR Code PIX"
-                    className="w-48 h-48 object-contain"
-                  />
-                </div>
-                <p className="text-sm text-center text-gray-600 dark:text-gray-400">
-                  Aponte a câmera do seu aplicativo de banco para o QR Code
-                </p>
-              </div>
-
-              {/* PIX Info */}
-              <div className="space-y-3">
-                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-                  <p className="text-xs font-medium text-blue-700 dark:text-blue-300 mb-1">CHAVE PIX:</p>
-                  <p className="text-sm font-bold text-blue-900 dark:text-blue-100">Igreja Evangélica Servos de Cristo</p>
-                </div>
-
-                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
-                  <p className="text-xs font-medium text-purple-700 dark:text-purple-300 mb-1">CNPJ:</p>
-                  <p className="text-sm font-bold text-purple-900 dark:text-purple-100">09.102.175/0001-84</p>
-                </div>
-              </div>
-
-              {/* Instructions */}
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
-                <div className="flex gap-3">
-                  <span className="material-symbols-outlined text-yellow-600 text-2xl">info</span>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-yellow-900 dark:text-yellow-100 mb-2">Como pagar:</p>
-                    <ol className="text-xs text-yellow-800 dark:text-yellow-200 space-y-1 list-decimal list-inside">
-                      <li>Abra o app do seu banco</li>
-                      <li>Escolha a opção PIX</li>
-                      <li>Escaneie o QR Code acima</li>
-                      <li>Confirme o pagamento</li>
-                    </ol>
-                  </div>
-                </div>
-              </div>
-
-              {/* Confirm Button */}
-              <button
-                onClick={() => {
-                  if (currentUser?.role === UserRole.ADMIN || confirm('Confirmar que o pagamento foi realizado?')) {
-                    payRecord(selectedPayment.id);
-                    setShowPixModal(false);
-                  }
-                }}
-                className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg transition-colors flex items-center justify-center gap-2"
-              >
-                <span className="material-symbols-outlined">check_circle</span>
-                Já Paguei
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* Payment Modal */}
       {/* Payment Modal */}
       {showPaymentModal && selectedRecord && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl p-6 animate-scale-in">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 animate-scale-in max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-xl text-gray-900">Adicionar Pagamento</h3>
+              <h3 className="font-bold text-xl text-gray-900">
+                {showPaymentInfo ? 'Realizar Pagamento' : 'Adicionar Pagamento'}
+              </h3>
               <button
                 onClick={() => {
                   setShowPaymentModal(false);
                   setSelectedRecord(null);
                   setPaymentAmount('');
                   setPaymentNotes('');
+                  setShowPaymentInfo(false);
                 }}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -539,78 +441,157 @@ const Financials: React.FC = () => {
               </button>
             </div>
 
-            <div className="mb-4 bg-blue-50 p-4 rounded-xl">
-              <p className="text-sm text-blue-900 font-medium mb-1">{selectedRecord.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-blue-600">Saldo Restante:</span>
-                <span className="text-lg font-bold text-blue-700">
-                  R$ {(selectedRecord.balance ?? selectedRecord.amount).toFixed(2)}
-                </span>
-              </div>
-            </div>
+            {!showPaymentInfo ? (
+              // Step 1: Payment Form
+              <>
+                <div className="mb-4 bg-blue-50 p-4 rounded-xl">
+                  <p className="text-sm text-blue-900 font-medium mb-1">{selectedRecord.description}</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-blue-600">Saldo Restante:</span>
+                    <span className="text-lg font-bold text-blue-700">
+                      R$ {(selectedRecord.balance ?? selectedRecord.amount).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
 
-            <div className="space-y-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Valor do Pagamento *</label>
-                <input
-                  type="number"
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)}
-                  placeholder="0,00"
-                  step="0.01"
-                  max={selectedRecord.balance ?? selectedRecord.amount}
-                  className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                  autoFocus
-                />
-                <p className="text-xs text-gray-500 mt-1">Máximo: R$ {(selectedRecord.balance ?? selectedRecord.amount).toFixed(2)}</p>
-              </div>
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Valor do Pagamento *</label>
+                    <input
+                      type="number"
+                      value={paymentAmount}
+                      onChange={(e) => setPaymentAmount(e.target.value)}
+                      placeholder="0,00"
+                      step="0.01"
+                      max={selectedRecord.balance ?? selectedRecord.amount}
+                      className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                      autoFocus
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Máximo: R$ {(selectedRecord.balance ?? selectedRecord.amount).toFixed(2)}</p>
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Método de Pagamento *</label>
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value as any)}
-                  className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
-                >
-                  <option value="PIX">PIX</option>
-                  <option value="Dinheiro">Dinheiro</option>
-                  <option value="Cartão">Cartão</option>
-                  <option value="Transferência">Transferência</option>
-                </select>
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Método de Pagamento *</label>
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value as any)}
+                      className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                    >
+                      <option value="PIX">PIX</option>
+                      <option value="Dinheiro">Dinheiro</option>
+                      <option value="Cartão">Cartão</option>
+                      <option value="Transferência">Transferência</option>
+                    </select>
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Observações (opcional)</label>
-                <textarea
-                  value={paymentNotes}
-                  onChange={(e) => setPaymentNotes(e.target.value)}
-                  placeholder="Ex: Pagamento referente à..."
-                  rows={3}
-                  className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none resize-none"
-                />
-              </div>
-            </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Observações (opcional)</label>
+                    <textarea
+                      value={paymentNotes}
+                      onChange={(e) => setPaymentNotes(e.target.value)}
+                      placeholder="Ex: Pagamento referente à..."
+                      rows={3}
+                      className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none resize-none"
+                    />
+                  </div>
+                </div>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowPaymentModal(false);
-                  setSelectedRecord(null);
-                  setPaymentAmount('');
-                  setPaymentNotes('');
-                }}
-                className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleAddPayment}
-                disabled={!paymentAmount || parseFloat(paymentAmount) <= 0}
-                className="flex-1 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Confirmar Pagamento
-              </button>
-            </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      setSelectedRecord(null);
+                      setPaymentAmount('');
+                      setPaymentNotes('');
+                      setShowPaymentInfo(false);
+                    }}
+                    className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (paymentMethod === 'PIX') {
+                        setShowPaymentInfo(true);
+                      } else {
+                        handleAddPayment();
+                      }
+                    }}
+                    disabled={!paymentAmount || parseFloat(paymentAmount) <= 0}
+                    className="flex-1 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {paymentMethod === 'PIX' ? (
+                      <>
+                        <span className="material-symbols-outlined">qr_code_2</span>
+                        Ir para Pagamento
+                      </>
+                    ) : (
+                      'Confirmar Pagamento'
+                    )}
+                  </button>
+                </div>
+              </>
+            ) : (
+              // Step 2: Payment Info (QR Code)
+              <div className="space-y-6 animate-fade-in">
+                <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Valor a Pagar:</span>
+                    <span className="text-2xl font-bold text-green-600">
+                      R$ {parseFloat(paymentAmount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+
+                {/* QR Code Section */}
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="bg-white p-4 rounded-xl border-4 border-green-500 shadow-lg">
+                    <img
+                      src="/pix-qrcode.png"
+                      alt="QR Code PIX"
+                      className="w-48 h-48 object-contain"
+                    />
+                  </div>
+                  <p className="text-sm text-center text-gray-600">
+                    Aponte a câmera do seu aplicativo de banco para o QR Code
+                  </p>
+                </div>
+
+                {/* PIX Info */}
+                <div className="space-y-3">
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <p className="text-xs font-medium text-blue-700 mb-1">CHAVE PIX:</p>
+                    <p className="text-sm font-bold text-blue-900">Igreja Evangélica Servos de Cristo</p>
+                  </div>
+
+                  <div className="bg-purple-50 rounded-lg p-4">
+                    <p className="text-xs font-medium text-purple-700 mb-1">CNPJ:</p>
+                    <p className="text-sm font-bold text-purple-900">09.102.175/0001-84</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => setShowPaymentInfo(false)}
+                    className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    Voltar
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm('Confirmar que o pagamento foi realizado?')) {
+                        handleAddPayment();
+                        setShowPaymentInfo(false);
+                      }
+                    }}
+                    className="flex-1 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined">check_circle</span>
+                    Já Paguei
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
