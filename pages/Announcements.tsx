@@ -19,9 +19,31 @@ const Announcements: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<AttachedFile[]>([]);
+  const [expirationDate, setExpirationDate] = useState('');
+  const [targetAudience, setTargetAudience] = useState<'ALL' | 'STUDENTS' | 'PROFESSORS'>('ALL');
   const [isPublishing, setIsPublishing] = useState(false);
 
-  const announcements = getVisibleAnnouncements();
+  const announcements = getVisibleAnnouncements().filter(ann => {
+    // 1. Filter by Expiration
+    if (ann.expiresAt) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const expiration = new Date(ann.expiresAt);
+      // Adjust expiration to end of day
+      expiration.setHours(23, 59, 59, 999);
+
+      if (today > expiration) return false;
+    }
+
+    // 2. Filter by Audience
+    if (currentUser?.role === UserRole.ADMIN) return true; // Admin sees all
+    if (!ann.targetAudience || ann.targetAudience === 'ALL') return true;
+
+    if (ann.targetAudience === 'STUDENTS' && currentUser?.role === UserRole.STUDENT) return true;
+    if (ann.targetAudience === 'PROFESSORS' && currentUser?.role === UserRole.PROFESSOR) return true;
+
+    return false;
+  });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -81,6 +103,8 @@ const Announcements: React.FC = () => {
         date: new Date().toLocaleDateString('pt-BR'),
         type: 'Geral',
         targetType: 'GLOBAL',
+        targetAudience,
+        expiresAt: expirationDate || undefined,
         targetId: undefined,
         attachments: uploadedAttachments
       });
@@ -88,6 +112,8 @@ const Announcements: React.FC = () => {
       setShowModal(false);
       setTitle('');
       setContent('');
+      setExpirationDate('');
+      setTargetAudience('ALL');
       setAttachedFiles([]);
     } catch (error) {
       console.error("Error publishing announcement:", error);
@@ -145,7 +171,9 @@ const Announcements: React.FC = () => {
               >
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex gap-2">
-                    <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded uppercase font-bold">{ann.targetType}</span>
+                    <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded uppercase font-bold">
+                      {ann.targetAudience === 'ALL' ? 'Todos' : ann.targetAudience === 'STUDENTS' ? 'Alunos' : 'Professores'}
+                    </span>
                     {!isRead && <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] rounded font-bold">NOVO</span>}
                   </div>
                   {canManage && (
@@ -195,12 +223,12 @@ const Announcements: React.FC = () => {
         <div className="fixed inset-0 bg-white z-[100] flex flex-col h-[100dvh]">
           {/* Header */}
           <div className="flex-none bg-white border-b border-gray-200 p-4 flex items-center justify-between z-10">
-            <button onClick={() => { setShowModal(false); setTitle(''); setContent(''); setAttachedFiles([]); }} className="text-gray-600">
+            <button onClick={() => { setShowModal(false); setTitle(''); setContent(''); setExpirationDate(''); setTargetAudience('ALL'); setAttachedFiles([]); }} className="text-gray-600">
               <span className="material-symbols-outlined">arrow_back</span>
             </button>
             <h1 className="font-bold text-lg text-gray-900">Novo Comunicado</h1>
             <button
-              onClick={() => { setShowModal(false); setTitle(''); setContent(''); setAttachedFiles([]); }}
+              onClick={() => { setShowModal(false); setTitle(''); setContent(''); setExpirationDate(''); setTargetAudience('ALL'); setAttachedFiles([]); }}
               className="text-primary font-medium text-sm"
             >
               Cancelar
@@ -218,6 +246,35 @@ const Announcements: React.FC = () => {
                 placeholder="Assunto do comunicado"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
+            </div>
+
+
+
+            {/* Configurações de Envio */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-900 font-medium mb-2">Público Alvo</label>
+                <select
+                  value={targetAudience}
+                  onChange={(e) => setTargetAudience(e.target.value as any)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+                >
+                  <option value="ALL">Todos</option>
+                  <option value="STUDENTS">Alunos</option>
+                  <option value="PROFESSORS">Professores</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-gray-900 font-medium mb-2">Validade (Opcional)</label>
+                <input
+                  type="date"
+                  value={expirationDate}
+                  onChange={(e) => setExpirationDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
             </div>
 
             {/* Mensagem */}
@@ -293,10 +350,11 @@ const Announcements: React.FC = () => {
             </button>
           </div>
         </div>
-      )}
+      )
+      }
 
       <BottomNav />
-    </div>
+    </div >
   );
 };
 

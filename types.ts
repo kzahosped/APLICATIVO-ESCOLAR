@@ -91,9 +91,11 @@ export interface Announcement {
   type: 'Acadêmico' | 'Financeiro' | 'Eventos' | 'Geral';
   // Regras de Targeting
   targetType: 'GLOBAL' | 'COURSE' | 'CLASS' | 'USER';
+  targetAudience?: 'ALL' | 'STUDENTS' | 'PROFESSORS'; // Segmentação por role
   targetId?: string; // ID do curso, turma ou aluno (null se Global)
   authorId: string;
   readBy: string[]; // Array de UserIDs que leram
+  expiresAt?: string; // Data de expiração (ISO string ou YYYY-MM-DD)
   attachments?: {
     name: string;
     url: string;
