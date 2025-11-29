@@ -289,7 +289,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const currentPayments = record.payments || [];
     const updatedPayments = [...currentPayments, newPayment];
     const totalPaid = updatedPayments.reduce((sum, p) => sum + p.amount, 0);
-    const newBalance = record.amount - totalPaid;
+
+    const discount = record.discount || 0;
+    const finalAmount = record.amount - discount;
+    const newBalance = finalAmount - totalPaid;
 
     // Determine new status
     let newStatus: 'Pago' | 'Pendente' | 'Vencido' | 'Parcial';
