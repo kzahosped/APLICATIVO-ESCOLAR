@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { User, UserRole, Grade, FinancialRecord, Announcement, InstitutionSettings, Notification, Ticket, CalendarEvent } from '../types';
+import { User, UserRole, Grade, FinancialRecord, Announcement, InstitutionSettings, Notification, Ticket, CalendarEvent, Payment } from '../types';
 import * as firestoreService from '../services/firestoreService';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -34,6 +34,7 @@ interface AppContextType {
 
   addFinancialRecord: (record: FinancialRecord) => Promise<void>;
   payRecord: (id: string) => Promise<void>;
+  addPayment: (recordId: string, payment: Omit<Payment, 'id'>) => Promise<void>;
   deleteFinancialRecord: (id: string) => Promise<void>;
 
   createTicket: (ticket: Omit<Ticket, 'id' | 'studentId' | 'status' | 'history' | 'createdAt'>) => Promise<void>;
@@ -274,6 +275,48 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     ));
   };
 
+  const addPayment = async (recordId: string, payment: Omit<Payment, 'id'>) => {
+    const record = financials.find(r => r.id === recordId);
+    if (!record) return;
+
+    // Create new payment with unique ID
+    const newPayment: Payment = {
+      ...payment,
+      id: Date.now().toString() + Math.random()
+    };
+
+    // Calculate new payments array and balance
+    const currentPayments = record.payments || [];
+    const updatedPayments = [...currentPayments, newPayment];
+    const totalPaid = updatedPayments.reduce((sum, p) => sum + p.amount, 0);
+    const newBalance = record.amount - totalPaid;
+
+    // Determine new status
+    let newStatus: 'Pago' | 'Pendente' | 'Vencido' | 'Parcial';
+    if (newBalance <= 0) {
+      newStatus = 'Pago';
+    } else if (totalPaid > 0) {
+      newStatus = 'Parcial';
+    } else {
+      // Keep existing status if no payments yet
+      newStatus = record.status;
+    }
+
+    // Update record
+    const updatedData = {
+      payments: updatedPayments,
+      balance: newBalance,
+      status: newStatus,
+      paidAt: newBalance <= 0 ? new Date().toISOString() : record.paidAt
+    };
+
+    await firestoreService.updateFinancialRecord(recordId, updatedData);
+
+    setFinancials(prev => prev.map(r =>
+      r.id === recordId ? { ...r, ...updatedData } : r
+    ));
+  };
+
   const deleteFinancialRecord = async (id: string) => {
     await firestoreService.deleteFinancialRecord(id);
     setFinancials(prev => prev.filter(r => r.id !== id));
@@ -415,7 +458,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       currentUser, users, financials, grades, announcements, notifications, tickets, events, settings, loading,
       login, logout,
       addAnnouncement, markAnnouncementAsRead, removeAnnouncement,
-      addFinancialRecord, payRecord,
+      addFinancialRecord, payRecord, addPayment, deleteFinancialRecord,
       createTicket, updateTicketStatus,
       updateGrade,
       addUser, removeUser, updateUser, updateSettings,

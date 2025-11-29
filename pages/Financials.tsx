@@ -7,7 +7,7 @@ import { INITIAL_CATEGORIES } from '../constants/initialData';
 
 const Financials: React.FC = () => {
   const navigate = useNavigate();
-  const { getVisibleFinancials, payRecord, currentUser, addFinancialRecord, users, deleteFinancialRecord } = useApp();
+  const { getVisibleFinancials, payRecord, addPayment, currentUser, addFinancialRecord, users, deleteFinancialRecord } = useApp();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
 
   // Admin States
@@ -17,6 +17,13 @@ const Financials: React.FC = () => {
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [category, setCategory] = useState('Mensalidade do curso');
+
+  // Payment Modal States
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<any>(null);
+  const [paymentAmount, setPaymentAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'Dinheiro' | 'PIX' | 'Cartão' | 'Transferência'>('PIX');
+  const [paymentNotes, setPaymentNotes] = useState('');
 
   // PIX Modal State
   const [showPixModal, setShowPixModal] = useState(false);
@@ -30,18 +37,29 @@ const Financials: React.FC = () => {
     ? allRecords.filter(r => r.studentId === currentUser.id)
     : allRecords;
 
-  // Calculate Totals
+  // Calculate Totals (considering partial payments)
   const totalPaid = studentRecords
     .filter(r => r.status === 'Pago')
     .reduce((acc, curr) => acc + curr.amount, 0);
 
   const totalPending = studentRecords
-    .filter(r => r.status === 'Pendente')
-    .reduce((acc, curr) => acc + curr.amount, 0);
+    .filter(r => r.status === 'Pendente' || r.status === 'Vencido')
+    .reduce((acc, curr) => acc + (curr.balance ?? curr.amount), 0);
+
+  const totalPartial = studentRecords
+    .filter(r => r.status === 'Parcial')
+    .reduce((acc, curr) => {
+      const totalPaidAmount = (curr.payments || []).reduce((sum, p) => sum + p.amount, 0);
+      return acc + totalPaidAmount;
+    }, 0);
+
+  const totalPartialBalance = studentRecords
+    .filter(r => r.status === 'Parcial')
+    .reduce((acc, curr) => acc + (curr.balance ?? 0), 0);
 
   const totalOverdue = studentRecords
     .filter(r => r.status === 'Vencido')
-    .reduce((acc, curr) => acc + curr.amount, 0);
+    .reduce((acc, curr) => acc + (curr.balance ?? curr.amount), 0);
 
   // Filter by Year
   const filteredRecords = studentRecords.filter(r =>
@@ -71,6 +89,32 @@ const Financials: React.FC = () => {
       setDueDate('');
       setSelectedStudent('');
     }
+  };
+
+  const handleAddPayment = async () => {
+    if (!selectedRecord || !paymentAmount) return;
+
+    const amount = parseFloat(paymentAmount);
+    const maxAmount = selectedRecord.balance ?? selectedRecord.amount;
+
+    if (amount <= 0 || amount > maxAmount) {
+      alert(`Por favor, insira um valor entre R$ 0,01 e R$ ${maxAmount.toFixed(2)}`);
+      return;
+    }
+
+    await addPayment(selectedRecord.id, {
+      amount,
+      date: new Date().toISOString(),
+      method: paymentMethod,
+      notes: paymentNotes || undefined
+    });
+
+    // Reset form
+    setShowPaymentModal(false);
+    setSelectedRecord(null);
+    setPaymentAmount('');
+    setPaymentMethod('PIX');
+    setPaymentNotes('');
   };
 
   return (
@@ -108,6 +152,23 @@ const Financials: React.FC = () => {
               </p>
             </div>
           </div>
+
+          {totalPartial > 0 && (
+            <div className="bg-blue-50 p-4 rounded-xl border border-blue-200 shadow-sm mb-3">
+              <p className="text-sm font-medium text-blue-900 mb-1">Pagamento Parcial</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-lg font-bold text-blue-700">
+                    R$ {totalPartial.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} <span className="text-sm font-normal">pago</span>
+                  </p>
+                  <p className="text-sm text-blue-600">
+                    Restam: R$ {totalPartialBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
             <p className="text-sm font-medium text-gray-600 mb-1">Total Vencido</p>
             <p className="text-2xl font-bold text-red-600">
@@ -142,6 +203,8 @@ const Financials: React.FC = () => {
             filteredRecords.map((record) => {
               const discount = record.discount || 0;
               const finalValue = record.amount - discount;
+              const balance = record.balance ?? finalValue;
+              const totalPaidForRecord = (record.payments || []).reduce((sum, p) => sum + p.amount, 0);
 
               return (
                 <div key={record.id} className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-md">
@@ -153,7 +216,8 @@ const Financials: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <div className={`p-2 rounded-lg ${record.status === 'Pago' ? 'bg-green-100 text-green-600' :
                         record.status === 'Vencido' ? 'bg-red-100 text-red-600' :
-                          'bg-orange-100 text-orange-600'
+                          record.status === 'Parcial' ? 'bg-blue-100 text-blue-600' :
+                            'bg-orange-100 text-orange-600'
                         }`}>
                         <span className="material-symbols-outlined">
                           {record.status === 'Pago' ? 'check_circle' : 'attach_money'}
@@ -164,12 +228,18 @@ const Financials: React.FC = () => {
                           {record.description || getMonthYear(record.dueDate)}
                         </h3>
                         <p className="text-xs text-gray-500">{record.category}</p>
+                        {record.status === 'Parcial' && (
+                          <p className="text-xs text-blue-600 font-medium mt-1">
+                            Pago: R$ {totalPaidForRecord.toFixed(2)} de R$ {finalValue.toFixed(2)}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold ${record.status === 'Pago' ? 'bg-green-100 text-green-700' :
                         record.status === 'Vencido' ? 'bg-red-100 text-red-700' :
-                          'bg-orange-100 text-orange-700'
+                          record.status === 'Parcial' ? 'bg-blue-100 text-blue-700' :
+                            'bg-orange-100 text-orange-700'
                         }`}>
                         {record.status}
                       </span>
@@ -203,6 +273,25 @@ const Financials: React.FC = () => {
                             - R$ {discount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </span>
                         </div>
+
+                        {/* Payment History */}
+                        {record.payments && record.payments.length > 0 && (
+                          <div className="bg-blue-50 p-3 rounded-lg mt-2">
+                            <p className="text-xs text-blue-900 uppercase font-bold mb-2">Histórico de Pagamentos</p>
+                            <div className="space-y-2">
+                              {record.payments.map((payment) => (
+                                <div key={payment.id} className="flex justify-between items-center text-sm border-b border-blue-100 pb-2 last:border-0">
+                                  <div>
+                                    <p className="font-medium text-blue-900">R$ {payment.amount.toFixed(2)}</p>
+                                    <p className="text-xs text-blue-600">{payment.method} - {new Date(payment.date).toLocaleDateString('pt-BR')}</p>
+                                    {payment.notes && <p className="text-xs text-gray-500 italic">{payment.notes}</p>}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
                         {record.paidAt && (
                           <div className="flex justify-between text-sm">
                             <span className="text-gray-600">Pago em:</span>
@@ -237,12 +326,15 @@ const Financials: React.FC = () => {
                     )}
 
                     <div className="flex justify-between items-center pt-3 border-t border-gray-100 mt-2">
-                      <span className="font-bold text-gray-700">Total a Pagar:</span>
+                      <span className="font-bold text-gray-700">
+                        {record.status === 'Parcial' ? 'Saldo Restante:' : 'Total a Pagar:'}
+                      </span>
                       <span className={`text-xl font-bold ${record.status === 'Pago' ? 'text-green-600' :
                         record.status === 'Vencido' ? 'text-red-600' :
-                          'text-orange-500'
+                          record.status === 'Parcial' ? 'text-blue-600' :
+                            'text-orange-500'
                         }`}>
-                        R$ {finalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        R$ {balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                   </div>
@@ -258,13 +350,13 @@ const Financials: React.FC = () => {
                       ) : (
                         <button
                           onClick={() => {
-                            setSelectedPayment(record);
-                            setShowPixModal(true);
+                            setSelectedRecord(record);
+                            setShowPaymentModal(true);
                           }}
                           className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:shadow-lg hover:scale-[1.02] transition-all flex items-center justify-center gap-2"
                         >
-                          <span className="material-symbols-outlined">qr_code_2</span>
-                          Pagar com PIX
+                          <span className="material-symbols-outlined">payments</span>
+                          {record.status === 'Parcial' ? 'Adicionar Pagamento' : 'Pagar'}
                         </button>
                       )}
                     </div>
@@ -422,6 +514,101 @@ const Financials: React.FC = () => {
               >
                 <span className="material-symbols-outlined">check_circle</span>
                 Já Paguei
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && selectedRecord && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 animate-scale-in">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-xl text-gray-900">Adicionar Pagamento</h3>
+              <button
+                onClick={() => {
+                  setShowPaymentModal(false);
+                  setSelectedRecord(null);
+                  setPaymentAmount('');
+                  setPaymentNotes('');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="mb-4 bg-blue-50 p-4 rounded-xl">
+              <p className="text-sm text-blue-900 font-medium mb-1">{selectedRecord.description}</p>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-blue-600">Saldo Restante:</span>
+                <span className="text-lg font-bold text-blue-700">
+                  R$ {(selectedRecord.balance ?? selectedRecord.amount).toFixed(2)}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Valor do Pagamento *</label>
+                <input
+                  type="number"
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(e.target.value)}
+                  placeholder="0,00"
+                  step="0.01"
+                  max={selectedRecord.balance ?? selectedRecord.amount}
+                  className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                  autoFocus
+                />
+                <p className="text-xs text-gray-500 mt-1">Máximo: R$ {(selectedRecord.balance ?? selectedRecord.amount).toFixed(2)}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Método de Pagamento *</label>
+                <select
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value as any)}
+                  className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="PIX">PIX</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Cartão">Cartão</option>
+                  <option value="Transferência">Transferência</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Observações (opcional)</label>
+                <textarea
+                  value={paymentNotes}
+                  onChange={(e) => setPaymentNotes(e.target.value)}
+                  placeholder="Ex: Pagamento referente à..."
+                  rows={3}
+                  className="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowPaymentModal(false);
+                  setSelectedRecord(null);
+                  setPaymentAmount('');
+                  setPaymentNotes('');
+                }}
+                className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleAddPayment}
+                disabled={!paymentAmount || parseFloat(paymentAmount) <= 0}
+                className="flex-1 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Confirmar Pagamento
               </button>
             </div>
           </div>
