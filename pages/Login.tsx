@@ -83,7 +83,7 @@ const Login: React.FC = () => {
           <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-float p-8 border border-white/20">
             {/* Logo */}
             <div className="flex justify-center mb-6">
-              <img src="/256x256.png" alt="SDC Sul Logo" className="h-20 w-20 object-contain drop-shadow-lg" />
+              <img src="/256x256.png" alt="SDC Sul Logo" className="h-32 w-32 object-contain drop-shadow-lg" />
             </div>
 
             <h1 className="text-3xl font-bold text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
