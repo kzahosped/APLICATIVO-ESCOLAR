@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
 import BottomNav from '../components/BottomNav';
 import { CalendarEvent, UserRole } from '../types';
 import { createEvent } from '../services/firestoreService';
 
 const Agenda: React.FC = () => {
+  const navigate = useNavigate();
   const { events, currentUser } = useApp();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -63,7 +65,12 @@ const Agenda: React.FC = () => {
   return (
     <div className="pb-24 min-h-screen bg-background-light dark:bg-background-dark">
       <div className="bg-white dark:bg-[#111621] p-4 sticky top-0 z-10 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center">
-        <h1 className="font-bold text-lg text-gray-900 dark:text-white">Agenda Acadêmica</h1>
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate(-1)} className="text-gray-600 dark:text-gray-400">
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+          <h1 className="font-bold text-lg text-gray-900 dark:text-white">Agenda Acadêmica</h1>
+        </div>
         {canCreateEvent && (
           <button
             onClick={() => setIsModalOpen(true)}

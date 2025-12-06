@@ -18,7 +18,7 @@ const Attendance: React.FC = () => {
     const [saving, setSaving] = useState(false);
 
     // Filter students based on role and class
-    const students = users.filter(u => u.role === UserRole.STUDENT);
+    const students = users.filter(u => u.role === UserRole.STUDENT && u.active !== false); // Apenas alunos ativos
 
     // Get unique classes from students
     const classes = Array.from(new Set(students.map(s => s.classId).filter(Boolean))) as string[];

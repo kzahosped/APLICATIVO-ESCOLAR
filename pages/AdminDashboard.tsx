@@ -107,6 +107,10 @@ const AdminDashboard: React.FC = () => {
             <span className="material-symbols-outlined text-3xl text-green-600">menu_book</span>
             <span className="font-medium text-sm">Matérias</span>
           </button>
+          <button onClick={() => navigate('/admin/manage-users')} className="p-4 bg-white dark:bg-[#1a202c] text-gray-800 dark:text-white border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm flex flex-col items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-[#1f2937]">
+            <span className="material-symbols-outlined text-3xl text-orange-600">manage_accounts</span>
+            <span className="font-medium text-sm">Usuários</span>
+          </button>
         </div>
 
         {/* Indicadores Importantes */}

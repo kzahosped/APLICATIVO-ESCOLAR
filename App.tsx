@@ -29,6 +29,10 @@ import StudentAttendance from './pages/StudentAttendance';
 import StudentReport from './pages/StudentReport';
 import StudentMaterials from './pages/StudentMaterials';
 import AdminSubjects from './pages/AdminSubjects';
+import ManageUsers from './pages/ManageUsers';
+import ProfessorAssignments from './pages/ProfessorAssignments';
+import StudentAssignments from './pages/StudentAssignments';
+import StudentPerformance from './pages/StudentPerformance';
 
 const ProtectedRoute = ({ children, allowedRoles }: { children?: React.ReactNode, allowedRoles: UserRole[] }) => {
   const { currentUser } = useApp();
@@ -61,6 +65,7 @@ const MainRouter = () => {
       <Route path="/admin/financial" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><Financials /></ProtectedRoute>} />
       <Route path="/admin/support" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><Support /></ProtectedRoute>} />
       <Route path="/admin/subjects" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AdminSubjects /></ProtectedRoute>} />
+      <Route path="/admin/manage-users" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ManageUsers /></ProtectedRoute>} />
 
       {/* Student Routes */}
       <Route path="/student" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentDashboard /></ProtectedRoute>} />
@@ -69,12 +74,15 @@ const MainRouter = () => {
       <Route path="/student/attendance" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentAttendance /></ProtectedRoute>} />
       <Route path="/student/report" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentReport /></ProtectedRoute>} />
       <Route path="/student/materials" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentMaterials /></ProtectedRoute>} />
+      <Route path="/student/assignments" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentAssignments /></ProtectedRoute>} />
+      <Route path="/student/performance" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentPerformance /></ProtectedRoute>} />
       <Route path="/student/support" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><Support /></ProtectedRoute>} />
 
       {/* Professor Routes */}
       <Route path="/professor" element={<ProtectedRoute allowedRoles={[UserRole.PROFESSOR]}><ProfessorDashboard /></ProtectedRoute>} />
       <Route path="/professor/grades" element={<ProtectedRoute allowedRoles={[UserRole.PROFESSOR]}><GradeEntry /></ProtectedRoute>} />
       <Route path="/professor/materials" element={<ProtectedRoute allowedRoles={[UserRole.PROFESSOR]}><ProfessorMaterials /></ProtectedRoute>} />
+      <Route path="/professor/assignments" element={<ProtectedRoute allowedRoles={[UserRole.PROFESSOR]}><ProfessorAssignments /></ProtectedRoute>} />
       <Route path="/attendance" element={<ProtectedRoute allowedRoles={[UserRole.PROFESSOR, UserRole.ADMIN]}><Attendance /></ProtectedRoute>} />
 
       {/* Shared Routes */}

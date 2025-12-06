@@ -10,7 +10,7 @@ import {
     where,
     setDoc
 } from 'firebase/firestore';
-import { User, Announcement, FinancialRecord, Grade, Ticket, Notification, CalendarEvent, UserRole, AttendanceRecord, Subject, Material } from '../types';
+import { User, Announcement, FinancialRecord, Grade, Ticket, Notification, CalendarEvent, UserRole, AttendanceRecord, Subject, Material, Assignment, AssignmentSubmission } from '../types';
 import { INITIAL_USERS, INITIAL_EVENTS } from '../constants/initialData';
 
 const USERS_COLLECTION = 'users';
@@ -23,6 +23,8 @@ const EVENTS_COLLECTION = 'events';
 const ATTENDANCE_COLLECTION = 'attendance';
 const SUBJECTS_COLLECTION = 'subjects';
 const MATERIALS_COLLECTION = 'materials';
+const ASSIGNMENTS_COLLECTION = 'assignments';
+const SUBMISSIONS_COLLECTION = 'submissions';
 
 // ==================== USERS ====================
 export const createUser = async (user: User) => {
@@ -388,6 +390,110 @@ export const deleteMaterial = async (materialId: string) => {
         return true;
     } catch (error) {
         console.error('Error deleting material:', error);
+        return false;
+    }
+};
+
+// ==================== ASSIGNMENTS ====================
+export const createAssignment = async (assignment: Assignment) => {
+    try {
+        await setDoc(doc(db, ASSIGNMENTS_COLLECTION, assignment.id), assignment);
+        return true;
+    } catch (error) {
+        console.error('Error creating assignment:', error);
+        return false;
+    }
+};
+
+export const getAssignments = async (subjectId?: string): Promise<Assignment[]> => {
+    try {
+        let q = query(collection(db, ASSIGNMENTS_COLLECTION));
+        if (subjectId) {
+            q = query(q, where('subjectId', '==', subjectId));
+        }
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => doc.data() as Assignment);
+    } catch (error) {
+        console.error('Error getting assignments:', error);
+        return [];
+    }
+};
+
+export const updateAssignment = async (assignmentId: string, data: Partial<Assignment>) => {
+    try {
+        await updateDoc(doc(db, ASSIGNMENTS_COLLECTION, assignmentId), data as any);
+        return true;
+    } catch (error) {
+        console.error('Error updating assignment:', error);
+        return false;
+    }
+};
+
+export const deleteAssignment = async (assignmentId: string) => {
+    try {
+        await deleteDoc(doc(db, ASSIGNMENTS_COLLECTION, assignmentId));
+        return true;
+    } catch (error) {
+        console.error('Error deleting assignment:', error);
+        return false;
+    }
+};
+
+// ==================== SUBMISSIONS ====================
+export const createSubmission = async (submission: AssignmentSubmission) => {
+    try {
+        await setDoc(doc(db, SUBMISSIONS_COLLECTION, submission.id), submission);
+        return true;
+    } catch (error) {
+        console.error('Error creating submission:', error);
+        return false;
+    }
+};
+
+export const getSubmissions = async (): Promise<AssignmentSubmission[]> => {
+    try {
+        const querySnapshot = await getDocs(collection(db, SUBMISSIONS_COLLECTION));
+        return querySnapshot.docs.map(doc => doc.data() as AssignmentSubmission);
+    } catch (error) {
+        console.error('Error getting submissions:', error);
+        return [];
+    }
+};
+
+export const getSubmissionsByAssignment = async (assignmentId: string): Promise<AssignmentSubmission[]> => {
+    try {
+        const q = query(
+            collection(db, SUBMISSIONS_COLLECTION),
+            where('assignmentId', '==', assignmentId)
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => doc.data() as AssignmentSubmission);
+    } catch (error) {
+        console.error('Error getting submissions by assignment:', error);
+        return [];
+    }
+};
+
+export const getSubmissionsByStudent = async (studentId: string): Promise<AssignmentSubmission[]> => {
+    try {
+        const q = query(
+            collection(db, SUBMISSIONS_COLLECTION),
+            where('studentId', '==', studentId)
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => doc.data() as AssignmentSubmission);
+    } catch (error) {
+        console.error('Error getting submissions by student:', error);
+        return [];
+    }
+};
+
+export const updateSubmission = async (submissionId: string, data: Partial<AssignmentSubmission>) => {
+    try {
+        await updateDoc(doc(db, SUBMISSIONS_COLLECTION, submissionId), data as any);
+        return true;
+    } catch (error) {
+        console.error('Error updating submission:', error);
         return false;
     }
 };

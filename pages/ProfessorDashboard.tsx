@@ -72,6 +72,12 @@ const ProfessorDashboard: React.FC = () => {
                     >
                       Materiais
                     </button>
+                    <button
+                      onClick={() => navigate('/professor/assignments')}
+                      className="flex-1 py-2 text-xs font-medium bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100"
+                    >
+                      Atividades
+                    </button>
                   </div>
                 </div>
               ))

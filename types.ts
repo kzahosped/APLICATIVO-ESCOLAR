@@ -28,6 +28,8 @@ export interface User {
   enrollmentYear?: string;
   // Campos para professor
   subjects?: string[]; // Matérias que o professor leciona
+  // Status ativo/inativo
+  active?: boolean; // true = ativo (padrão), false = inativo
 }
 
 export interface Course {
@@ -157,6 +159,30 @@ export interface Material {
   subjectId: string;
   date: string;
   description?: string;
+}
+
+// Sistema de Atividades/Tarefas
+export interface Assignment {
+  id: string;
+  title: string;
+  description: string;
+  subjectId: string;
+  teacherId: string;
+  dueDate: string; // YYYY-MM-DD
+  totalPoints: number;
+  createdAt: string;
+}
+
+export interface AssignmentSubmission {
+  id: string;
+  assignmentId: string;
+  studentId: string;
+  content: string; // Texto da resposta
+  fileUrl?: string; // Link para arquivo (opcional)
+  submittedAt: string;
+  status: 'pending' | 'submitted' | 'graded';
+  grade?: number; // Nota recebida
+  feedback?: string; // Comentário do professor
 }
 
 export interface InstitutionSettings {

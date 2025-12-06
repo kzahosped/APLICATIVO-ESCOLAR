@@ -42,7 +42,37 @@ const StudentDashboard: React.FC = () => {
                 </button>
             </div>
 
+            {/* Aviso de Conta Inativa */}
+            {currentUser && currentUser.active === false && (
+                <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-600 p-4 mx-4 mt-4 rounded-r-xl">
+                    <div className="flex items-start gap-3">
+                        <span className="material-symbols-outlined text-red-600 text-2xl">warning</span>
+                        <div>
+                            <h3 className="font-bold text-red-900 dark:text-red-100 mb-1">Conta Inativa</h3>
+                            <p className="text-sm text-red-800 dark:text-red-200">
+                                Sua conta está marcada como inativa. Você pode visualizar seus dados, mas não poderá participar de atividades.
+                                Entre em contato com a secretaria para mais informações.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="p-4 space-y-4">
+                {/* Card Performance */}
+                <div
+                    onClick={() => navigate('/student/performance')}
+                    className="bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl shadow-lg cursor-pointer active:scale-98 transition-transform"
+                >
+                    <div className="flex items-center justify-between text-white">
+                        <div>
+                            <h2 className="font-medium text-sm mb-1 opacity-90">Análise de Performance</h2>
+                            <p className="text-2xl font-bold">Ver Estatísticas</p>
+                        </div>
+                        <span className="material-symbols-outlined text-5xl opacity-80">analytics</span>
+                    </div>
+                </div>
+
                 {/* Card Financeiro */}
                 <div
                     onClick={() => navigate('/student/financial')}
