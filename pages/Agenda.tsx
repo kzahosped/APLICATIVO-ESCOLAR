@@ -12,7 +12,7 @@ const Agenda: React.FC = () => {
   const [formData, setFormData] = useState({
     title: '',
     date: '',
-    type: 'Outro' as CalendarEvent['type'],
+    type: 'Evento' as CalendarEvent['type'],
     description: ''
   });
 
@@ -41,7 +41,7 @@ const Agenda: React.FC = () => {
     e.preventDefault();
 
     const newEvent: CalendarEvent = {
-      id: crypto.randomUUID(),
+      id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       title: formData.title,
       date: formData.date, // YYYY-MM-DD
       type: formData.type,
@@ -54,7 +54,7 @@ const Agenda: React.FC = () => {
     if (success) {
       alert('Evento criado com sucesso!');
       setIsModalOpen(false);
-      setFormData({ title: '', date: '', type: 'Outro', description: '' });
+      setFormData({ title: '', date: '', type: 'Evento', description: '' });
       // Recarregar eventos seria ideal, mas o contexto deve atualizar se for realtime ou se forçar refresh
       window.location.reload(); // Forçar refresh simples
     } else {
@@ -137,7 +137,8 @@ const Agenda: React.FC = () => {
                   <option value="Prova">Prova</option>
                   <option value="Trabalho">Trabalho</option>
                   <option value="Feriado">Feriado</option>
-                  <option value="Outro">Outro</option>
+                  <option value="Aula">Aula</option>
+                  <option value="Evento">Evento</option>
                 </select>
               </div>
               <div>
