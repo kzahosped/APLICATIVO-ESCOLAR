@@ -76,6 +76,7 @@ const MainRouter = () => {
       <Route path="/student/materials" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentMaterials /></ProtectedRoute>} />
       <Route path="/student/assignments" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentAssignments /></ProtectedRoute>} />
       <Route path="/student/performance" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentPerformance /></ProtectedRoute>} />
+      <Route path="/student/agenda" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><Agenda /></ProtectedRoute>} />
       <Route path="/student/support" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><Support /></ProtectedRoute>} />
 
       {/* Professor Routes */}
