@@ -44,6 +44,9 @@ const ProtectedRoute = ({ children, allowedRoles }: { children?: React.ReactNode
 const MainRouter = () => {
   const { currentUser } = useApp();
 
+  // Gerencia o botão voltar do Android (temporariamente desativado para teste)
+  // useBackButton();
+
   return (
     <Routes>
       {/* Public Routes */}
