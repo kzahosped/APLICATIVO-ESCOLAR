@@ -23,34 +23,49 @@ const StudentDashboard: React.FC = () => {
     const hasUnread = announcements.some(a => !a.readBy.includes(currentUser?.id || ''));
 
     return (
-        <div className="pb-24 min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-white p-4 sticky top-0 z-10 flex justify-between items-center shadow-sm">
-                <div className="flex items-center gap-3">
-                    <img
-                        src={currentUser?.avatarUrl}
-                        alt="Profile"
-                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
-                    />
-                    <div>
-                        <h1 className="font-bold text-xl text-gray-900">Olá, {currentUser?.name?.split(' ')[0]}!</h1>
+        <div className="pb-24 min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-[#0f0f1a] dark:to-[#1a1a2e]">
+            {/* Header Premium */}
+            <div
+                className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 px-5 pt-12 pb-8"
+                style={{ paddingTop: 'max(48px, env(safe-area-inset-top))' }}
+            >
+                <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-4">
+                        <div className="relative">
+                            <img
+                                src={currentUser?.avatarUrl}
+                                alt="Profile"
+                                className="w-16 h-16 rounded-2xl object-cover border-3 border-white/30 shadow-xl"
+                            />
+                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-white"></div>
+                        </div>
+                        <div>
+                            <p className="text-white/80 text-sm font-medium">Bem-vindo(a) de volta,</p>
+                            <h1 className="font-bold text-2xl text-white">{currentUser?.name?.split(' ')[0]}!</h1>
+                        </div>
                     </div>
+                    <button
+                        onClick={() => navigate('/notifications')}
+                        className="relative p-3 bg-white/10 backdrop-blur-sm rounded-2xl active:scale-95 transition-transform"
+                    >
+                        <span className="material-symbols-outlined text-white text-2xl">notifications</span>
+                        {hasUnread && (
+                            <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                        )}
+                    </button>
                 </div>
-                <button onClick={() => navigate('/notifications')} className="relative text-gray-600 p-2 hover:bg-gray-100 rounded-full transition-colors">
-                    <span className="material-symbols-outlined">notifications</span>
-                    {hasUnread && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>}
-                </button>
             </div>
 
             {/* Aviso de Conta Inativa */}
             {currentUser && currentUser.active === false && (
-                <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-600 p-4 mx-4 mt-4 rounded-r-xl">
+                <div className="mx-4 -mt-4 mb-4 bg-red-500/10 backdrop-blur-xl border border-red-500/20 p-4 rounded-2xl animate-fade-in">
                     <div className="flex items-start gap-3">
-                        <span className="material-symbols-outlined text-red-600 text-2xl">warning</span>
+                        <div className="p-2 bg-red-500/20 rounded-xl">
+                            <span className="material-symbols-outlined text-red-500 text-xl">warning</span>
+                        </div>
                         <div>
-                            <h3 className="font-bold text-red-900 dark:text-red-100 mb-1">Conta Inativa</h3>
-                            <p className="text-sm text-red-800 dark:text-red-200">
-                                Sua conta está marcada como inativa. Você pode visualizar seus dados, mas não poderá participar de atividades.
+                            <h3 className="font-bold text-red-600 dark:text-red-400 mb-1">Conta Inativa</h3>
+                            <p className="text-sm text-red-600/80 dark:text-red-300/80">
                                 Entre em contato com a secretaria para mais informações.
                             </p>
                         </div>
@@ -58,136 +73,120 @@ const StudentDashboard: React.FC = () => {
                 </div>
             )}
 
-            <div className="p-4 space-y-4">
-                {/* Card Performance */}
+            {/* Cards sobrepostos ao header */}
+            <div className="px-4 -mt-6 space-y-4">
+                {/* Card Performance - Destaque */}
                 <div
                     onClick={() => navigate('/student/performance')}
-                    className="bg-gradient-to-br from-purple-500 to-indigo-600 p-5 rounded-2xl shadow-lg cursor-pointer active:scale-98 transition-transform"
+                    className="bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-600 p-5 rounded-3xl shadow-xl cursor-pointer active:scale-[0.98] transition-all duration-200 touch-feedback animate-fade-in"
+                    style={{ animationDelay: '0.1s' }}
                 >
                     <div className="flex items-center justify-between text-white">
                         <div>
-                            <h2 className="font-medium text-sm mb-1 opacity-90">Análise de Performance</h2>
-                            <p className="text-2xl font-bold">Ver Estatísticas</p>
+                            <p className="text-white/80 text-xs font-medium uppercase tracking-wider mb-1">Performance</p>
+                            <h2 className="text-xl font-bold">Ver Estatísticas</h2>
+                            <p className="text-white/70 text-sm mt-1">Acompanhe seu desempenho</p>
                         </div>
-                        <span className="material-symbols-outlined text-5xl opacity-80">analytics</span>
+                        <div className="bg-white/20 p-4 rounded-2xl backdrop-blur-sm">
+                            <span className="material-symbols-outlined text-4xl">analytics</span>
+                        </div>
                     </div>
                 </div>
 
                 {/* Card Financeiro */}
                 <div
                     onClick={() => navigate('/student/financial')}
-                    className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 active:scale-98 transition-transform cursor-pointer"
+                    className="bg-white dark:bg-[#1a1a2e] p-5 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-800 cursor-pointer active:scale-[0.98] transition-all duration-200 touch-feedback animate-fade-in"
+                    style={{ animationDelay: '0.15s' }}
                 >
-                    <h2 className="text-red-400 font-medium text-sm mb-2">Situação Financeira</h2>
+                    <div className="flex items-start justify-between mb-3">
+                        <div className="p-3 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl">
+                            <span className="material-symbols-outlined text-white text-2xl">payments</span>
+                        </div>
+                        <span className="material-symbols-outlined text-gray-300 dark:text-gray-600">chevron_right</span>
+                    </div>
+                    <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-1">Situação Financeira</h3>
                     {pendingFinancials.length > 0 ? (
                         <>
-                            <p className="text-xl font-bold text-gray-900 mb-1">
-                                {pendingFinancials.length} {pendingFinancials.length === 1 ? 'mensalidade pendente' : 'mensalidades pendentes'}
+                            <p className="text-red-500 font-semibold">
+                                {pendingFinancials.length} {pendingFinancials.length === 1 ? 'pendência' : 'pendências'}
                             </p>
                             {nextPayment && (
-                                <p className="text-sm text-gray-500 mb-3">
-                                    Vencimento em {new Date(nextPayment.dueDate).toLocaleDateString('pt-BR')}
+                                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                                    Vence em {new Date(nextPayment.dueDate).toLocaleDateString('pt-BR')}
                                 </p>
                             )}
-                            <p className="text-sm text-gray-400">Clique para ver detalhes e gerar boleto</p>
                         </>
                     ) : (
-                        <div className="flex items-center gap-2 text-green-600">
-                            <span className="material-symbols-outlined">check_circle</span>
-                            <p className="font-bold">Tudo em dia!</p>
+                        <div className="flex items-center gap-2 text-green-500">
+                            <span className="material-symbols-outlined text-sm">check_circle</span>
+                            <span className="font-semibold">Tudo em dia!</span>
                         </div>
                     )}
                 </div>
 
-                {/* Card Avaliações */}
-                <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 className="text-orange-400 font-medium text-sm mb-2">Próximas Avaliações</h2>
-                    {nextExam ? (
-                        <>
-                            <p className="text-xl font-bold text-gray-900 mb-1">{nextExam.title}</p>
-                            <p className="text-sm text-gray-500 mb-3">
-                                Data: {new Date(nextExam.date).toLocaleDateString('pt-BR')}
-                            </p>
-                            <p className="text-sm text-gray-400">Clique para ver todas as avaliações</p>
-                        </>
-                    ) : (
-                        <p className="text-gray-500 font-medium">Nenhuma avaliação agendada.</p>
-                    )}
+                {/* Card Atividades */}
+                <div
+                    onClick={() => navigate('/student/assignments')}
+                    className="bg-white dark:bg-[#1a1a2e] p-5 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-800 cursor-pointer active:scale-[0.98] transition-all duration-200 touch-feedback animate-fade-in"
+                    style={{ animationDelay: '0.2s' }}
+                >
+                    <div className="flex items-start justify-between mb-3">
+                        <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl">
+                            <span className="material-symbols-outlined text-white text-2xl">task_alt</span>
+                        </div>
+                        <span className="material-symbols-outlined text-gray-300 dark:text-gray-600">chevron_right</span>
+                    </div>
+                    <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-1">Atividades</h3>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">Ver tarefas e entregas</p>
+                </div>
+
+                {/* Grid de Acesso Rápido */}
+                <div className="pt-2">
+                    <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-1">Acesso Rápido</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                        {[
+                            { icon: 'how_to_reg', label: 'Frequência', desc: 'Minhas presenças', path: '/student/attendance', color: 'from-emerald-500 to-teal-500' },
+                            { icon: 'assignment', label: 'Boletim', desc: 'Notas e médias', path: '/student/report', color: 'from-amber-500 to-orange-500' },
+                            { icon: 'calendar_month', label: 'Agenda', desc: 'Aulas e eventos', path: '/student/agenda', color: 'from-blue-500 to-indigo-500' },
+                            { icon: 'folder_open', label: 'Materiais', desc: 'Arquivos e links', path: '/student/materials', color: 'from-purple-500 to-pink-500' },
+                        ].map((item, idx) => (
+                            <button
+                                key={item.path}
+                                onClick={() => navigate(item.path)}
+                                className="bg-white dark:bg-[#1a1a2e] p-4 rounded-2xl shadow-md border border-gray-100 dark:border-gray-800 flex flex-col items-start gap-3 active:scale-[0.97] transition-all duration-200 touch-feedback animate-fade-in"
+                                style={{ animationDelay: `${0.25 + idx * 0.05}s` }}
+                            >
+                                <div className={`p-2.5 bg-gradient-to-br ${item.color} rounded-xl`}>
+                                    <span className="material-symbols-outlined text-white text-xl">{item.icon}</span>
+                                </div>
+                                <div className="text-left">
+                                    <p className="font-bold text-gray-900 dark:text-white text-sm">{item.label}</p>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400">{item.desc}</p>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Card Comunicados */}
                 <div
                     onClick={() => navigate('/announcements')}
-                    className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 active:scale-98 transition-transform cursor-pointer"
+                    className="bg-white dark:bg-[#1a1a2e] p-4 rounded-2xl shadow-md border border-gray-100 dark:border-gray-800 flex items-center gap-4 cursor-pointer active:scale-[0.98] transition-all duration-200 touch-feedback animate-fade-in"
+                    style={{ animationDelay: '0.4s' }}
                 >
-                    <div className="bg-gray-100 p-3 rounded-xl">
-                        <span className="material-symbols-outlined text-gray-600">campaign</span>
+                    <div className="p-3 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl">
+                        <span className="material-symbols-outlined text-white text-xl">campaign</span>
                     </div>
-                    <div className="flex-1">
-                        <h3 className="font-bold text-gray-900">Últimos Comunicados</h3>
-                        <p className="text-sm text-gray-500 line-clamp-1">
+                    <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-gray-900 dark:text-white">Comunicados</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                             {latestAnnouncement ? latestAnnouncement.title : 'Nenhum comunicado recente'}
                         </p>
                     </div>
-                    {hasUnread && <div className="w-3 h-3 bg-green-500 rounded-full"></div>}
-                </div>
-
-                {/* Grid de Acesso Rápido */}
-                <div className="grid grid-cols-2 gap-4">
-                    <button
-                        onClick={() => navigate('/student/attendance')}
-                        className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-start gap-3 hover:shadow-md transition-shadow"
-                    >
-                        <span className="material-symbols-outlined text-blue-600 text-3xl">how_to_reg</span>
-                        <div className="text-left">
-                            <p className="font-bold text-gray-900">Frequência</p>
-                            <p className="text-xs text-gray-500">Minhas presenças</p>
-                        </div>
-                    </button>
-
-                    <button
-                        onClick={() => navigate('/student/report')}
-                        className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-start gap-3 hover:shadow-md transition-shadow"
-                    >
-                        <span className="material-symbols-outlined text-blue-600 text-3xl">assignment</span>
-                        <div className="text-left">
-                            <p className="font-bold text-gray-900">Boletim</p>
-                            <p className="text-xs text-gray-500">Notas e médias</p>
-                        </div>
-                    </button>
-
-                    <button
-                        onClick={() => navigate('/student/agenda')}
-                        className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-start gap-3 hover:shadow-md transition-shadow"
-                    >
-                        <span className="material-symbols-outlined text-blue-600 text-3xl">calendar_month</span>
-                        <div className="text-left">
-                            <p className="font-bold text-gray-900">Agenda</p>
-                            <p className="text-xs text-gray-500">Aulas e eventos</p>
-                        </div>
-                    </button>
-
-                    <button
-                        onClick={() => navigate('/student/materials')}
-                        className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-start gap-3 hover:shadow-md transition-shadow"
-                    >
-                        <span className="material-symbols-outlined text-blue-600 text-3xl">folder_open</span>
-                        <div className="text-left">
-                            <p className="font-bold text-gray-900">Materiais</p>
-                            <p className="text-xs text-gray-500">Arquivos e links</p>
-                        </div>
-                    </button>
-
-                    <button
-                        onClick={() => navigate('/announcements')}
-                        className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-start gap-3 hover:shadow-md transition-shadow"
-                    >
-                        <span className="material-symbols-outlined text-blue-600 text-3xl">description</span>
-                        <div className="text-left">
-                            <p className="font-bold text-gray-900">Comunicados</p>
-                            <p className="text-xs text-gray-500">Avisos importantes</p>
-                        </div>
-                    </button>
+                    {hasUnread && (
+                        <div className="w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse shadow-lg shadow-green-500/50"></div>
+                    )}
                 </div>
             </div>
 
