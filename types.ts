@@ -204,3 +204,15 @@ export interface AttendanceRecord {
     status: AttendanceStatus;
   }[];
 }
+
+// Sistema de Disciplinas do Aluno (Livros, Memorizações, Punições)
+export interface StudentDiscipline {
+  id: string;
+  studentId: string;
+  type: 'book' | 'memorization' | 'punishment';
+  title: string;
+  description?: string;
+  date: string;
+  createdBy: string;
+}
+

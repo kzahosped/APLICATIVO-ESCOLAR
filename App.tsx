@@ -33,6 +33,9 @@ import ManageUsers from './pages/ManageUsers';
 import ProfessorAssignments from './pages/ProfessorAssignments';
 import StudentAssignments from './pages/StudentAssignments';
 import StudentPerformance from './pages/StudentPerformance';
+import StudentFinances from './pages/StudentFinances';
+import StudentSimpleReport from './pages/StudentSimpleReport';
+import StudentDisciplines from './pages/StudentDisciplines';
 
 const ProtectedRoute = ({ children, allowedRoles }: { children?: React.ReactNode, allowedRoles: UserRole[] }) => {
   const { currentUser } = useApp();
@@ -81,6 +84,9 @@ const MainRouter = () => {
       <Route path="/student/performance" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentPerformance /></ProtectedRoute>} />
       <Route path="/student/agenda" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><Agenda /></ProtectedRoute>} />
       <Route path="/student/support" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><Support /></ProtectedRoute>} />
+      <Route path="/student/finances" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentFinances /></ProtectedRoute>} />
+      <Route path="/student/simple-report" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentSimpleReport /></ProtectedRoute>} />
+      <Route path="/student/disciplines" element={<ProtectedRoute allowedRoles={[UserRole.STUDENT]}><StudentDisciplines /></ProtectedRoute>} />
 
       {/* Professor Routes */}
       <Route path="/professor" element={<ProtectedRoute allowedRoles={[UserRole.PROFESSOR]}><ProfessorDashboard /></ProtectedRoute>} />

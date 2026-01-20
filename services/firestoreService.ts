@@ -10,7 +10,7 @@ import {
     where,
     setDoc
 } from 'firebase/firestore';
-import { User, Announcement, FinancialRecord, Grade, Ticket, Notification, CalendarEvent, UserRole, AttendanceRecord, Subject, Material, Assignment, AssignmentSubmission } from '../types';
+import { User, Announcement, FinancialRecord, Grade, Ticket, Notification, CalendarEvent, UserRole, AttendanceRecord, Subject, Material, Assignment, AssignmentSubmission, StudentDiscipline } from '../types';
 import { INITIAL_USERS, INITIAL_EVENTS } from '../constants/initialData';
 
 const USERS_COLLECTION = 'users';
@@ -25,6 +25,7 @@ const SUBJECTS_COLLECTION = 'subjects';
 const MATERIALS_COLLECTION = 'materials';
 const ASSIGNMENTS_COLLECTION = 'assignments';
 const SUBMISSIONS_COLLECTION = 'submissions';
+const DISCIPLINES_COLLECTION = 'studentDisciplines';
 
 // ==================== USERS ====================
 export const createUser = async (user: User) => {
@@ -494,6 +495,41 @@ export const updateSubmission = async (submissionId: string, data: Partial<Assig
         return true;
     } catch (error) {
         console.error('Error updating submission:', error);
+        return false;
+    }
+};
+
+// ==================== STUDENT DISCIPLINES ====================
+export const createStudentDiscipline = async (discipline: StudentDiscipline) => {
+    try {
+        await setDoc(doc(db, DISCIPLINES_COLLECTION, discipline.id), discipline);
+        return true;
+    } catch (error) {
+        console.error('Error creating student discipline:', error);
+        return false;
+    }
+};
+
+export const getStudentDisciplines = async (studentId?: string): Promise<StudentDiscipline[]> => {
+    try {
+        let q = query(collection(db, DISCIPLINES_COLLECTION));
+        if (studentId) {
+            q = query(q, where('studentId', '==', studentId));
+        }
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => doc.data() as StudentDiscipline);
+    } catch (error) {
+        console.error('Error getting student disciplines:', error);
+        return [];
+    }
+};
+
+export const deleteStudentDiscipline = async (disciplineId: string) => {
+    try {
+        await deleteDoc(doc(db, DISCIPLINES_COLLECTION, disciplineId));
+        return true;
+    } catch (error) {
+        console.error('Error deleting student discipline:', error);
         return false;
     }
 };

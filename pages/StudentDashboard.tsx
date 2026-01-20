@@ -95,7 +95,7 @@ const StudentDashboard: React.FC = () => {
 
                 {/* Card Financeiro */}
                 <div
-                    onClick={() => navigate('/student/financial')}
+                    onClick={() => navigate('/student/finances')}
                     className="bg-white dark:bg-[#1a1a2e] p-5 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-800 cursor-pointer active:scale-[0.98] transition-all duration-200 touch-feedback animate-fade-in"
                     style={{ animationDelay: '0.15s' }}
                 >
@@ -147,9 +147,10 @@ const StudentDashboard: React.FC = () => {
                     <div className="grid grid-cols-2 gap-3">
                         {[
                             { icon: 'how_to_reg', label: 'Frequência', desc: 'Minhas presenças', path: '/student/attendance', color: 'from-emerald-500 to-teal-500' },
-                            { icon: 'assignment', label: 'Boletim', desc: 'Notas e médias', path: '/student/report', color: 'from-amber-500 to-orange-500' },
+                            { icon: 'assignment', label: 'Boletim', desc: 'Notas e médias', path: '/student/simple-report', color: 'from-amber-500 to-orange-500' },
                             { icon: 'calendar_month', label: 'Agenda', desc: 'Aulas e eventos', path: '/student/agenda', color: 'from-blue-500 to-indigo-500' },
                             { icon: 'folder_open', label: 'Materiais', desc: 'Arquivos e links', path: '/student/materials', color: 'from-purple-500 to-pink-500' },
+                            { icon: 'menu_book', label: 'Disciplinas', desc: 'Livros e memorizações', path: '/student/disciplines', color: 'from-cyan-500 to-teal-500' },
                         ].map((item, idx) => (
                             <button
                                 key={item.path}
