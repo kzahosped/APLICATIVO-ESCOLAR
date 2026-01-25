@@ -13,8 +13,12 @@ const firebaseConfig = {
     appId: "1:40055006162:web:6bb2c82c350e893c435e0b"
 };
 
-// Inicializar Firebase
+// Inicializar Firebase (app principal)
 const app = initializeApp(firebaseConfig);
+
+// Inicializar app secundário para criar usuários sem afetar a sessão atual
+const secondaryApp = initializeApp(firebaseConfig, 'SecondaryApp');
+export const secondaryAuth = getAuth(secondaryApp);
 
 // Inicializar serviços
 export const db = getFirestore(app);

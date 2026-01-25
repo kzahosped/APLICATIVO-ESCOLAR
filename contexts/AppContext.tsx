@@ -1,9 +1,9 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User, UserRole, Grade, FinancialRecord, Announcement, InstitutionSettings, Notification, Ticket, CalendarEvent, Payment, AttendanceRecord } from '../types';
 import * as firestoreService from '../services/firestoreService';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../services/firebase';
+import { secondaryAuth } from '../services/firebase';
+
 
 const INITIAL_SETTINGS: InstitutionSettings = {
   name: 'Seminário Teológico Servos de Cristo',
@@ -416,8 +416,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // --- USER MGMT ---
   const addUser = async (user: User) => {
     try {
-      // Create user in Firebase Authentication first
-      await createUserWithEmailAndPassword(auth, user.email, user.password);
+      // Create user in Firebase Authentication using secondary auth
+      // This prevents logging out the current admin user
+      const userCredential = await createUserWithEmailAndPassword(secondaryAuth, user.email, user.password);
+
+      // Sign out from secondary auth immediately (doesn't affect main auth)
+      await secondaryAuth.signOut();
 
       // Then save to Firestore
       await firestoreService.createUser(user);
